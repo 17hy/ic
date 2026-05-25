@@ -1,0 +1,35 @@
+* CMOS Inverter with extremely slow input transition
+.include ../../models/educational_cmos.inc
+
+* 1. 供电电源
+Vdd vdd 0 1.8
+
+* 2. 定义慢速脉冲输入源
+* 语法: PULSE(V1 V2 延迟 上升时间(Tr) 下降时间(Tf) 脉宽 周期)
+* 这里故意把 Tr 和 Tf 设为非常夸张的 5ns (5纳秒)
+Vin in 0 PULSE(0 1.8 1n 5n 5n 10n 30n)
+
+* 3. 搭建 CMOS 反相器
+Mp out in vdd vdd PMOS W=8u L=0.18u
+Mn out in 0 0 NMOS W=4u L=0.18u
+
+* 加上一个极其微小的 10fF 负载电容，模拟下一级的栅极寄生，让波形更真实
+Cload out 0 10f
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+
+* 跑一个 25ns 的瞬态仿真，步长 10ps
+tran 10p 25n
+
+* 【画图 1】：看输入和输出的电压波形交叉
+plot v(in) v(out) title "Slow Input: Vin vs Vout"
+
+* 【画图 2】：看电源端的短路尖峰电流 (极其关键！)
+plot -i(Vdd) title "Short-Circuit (Crowbar) Current Spike"
+
+* quit
+.endc
+.end

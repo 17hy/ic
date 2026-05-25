@@ -1,0 +1,84 @@
+* Replicating Rabaey Figure 5.23: tp vs ts
+.include ../../models/educational_cmos.inc
+
+* 1. 定义一个可以被外部循环修改的上升/下降时间参数 TR
+.param TR=10p
+
+Vdd vdd 0 1.8
+* 2. 激励源：占空比 50%，周期 2ns，上升下降沿由参数 {TR} 决定
+Vin in 0 PULSE(0 1.8 100p {TR} {TR} 1n 2n)
+
+* 3. DUT (Device Under Test) 被测反相器
+Mp1 out in vdd vdd PMOS W=8u L=0.18u
+Mn1 out in 0 0 NMOS W=4u L=0.18u
+
+* 4. 负载 (Fan-out of a single gate)
+* 书中强调了 "fan-out of a single gate"，意味着它的负载是另一个尺寸完全相同的反相器
+Mp2 out2 out vdd vdd PMOS W=8u L=0.18u
+Mn2 out2 out 0 0 NMOS W=4u L=0.18u
+
+.control
+set noaskquit
+
+* ==========================================
+* 核心魔法：使用 const plot 存储循环测量产生的数据
+* ==========================================
+setplot const
+let points = 60
+let ts_vec = unitvec(points)
+let tp_vec = unitvec(points)
+let idx = 0
+
+* 设置扫描范围：从 2ps 到 120ps，步进 2ps
+let tr_val = 2p
+let tr_max = 120p
+let tr_step = 2p
+
+* ==========================================
+* 开始自动扫描与测量循环
+* ==========================================
+while tr_val <= tr_max
+    * 改变电路的 TR 参数并重置电路结构
+    alterparam TR = $&tr_val
+    reset
+    
+    * 跑 3ns 的瞬态仿真，足够覆盖一个完整的上升沿和下降沿
+    tran 1p 3n
+
+    * 【测量 1】：严格按照书中定义，测量输入信号的 10%-90% 上升时间 (ts)
+    meas tran t_10 when v(in)=0.18 RISE=1
+    meas tran t_90 when v(in)=1.62 RISE=1
+    let ts_cur = t_90 - t_10
+
+    * 【测量 2】：测量下降延迟 tphl (输入过 50% 到输出过 50%)
+    meas tran t_in50_r when v(in)=0.9 RISE=1
+    meas tran t_out50_f when v(out)=0.9 FALL=1
+    let tphl = t_out50_f - t_in50_r
+
+    * 【测量 3】：测量上升延迟 tplh
+    meas tran t_in50_f when v(in)=0.9 FALL=1
+    meas tran t_out50_r when v(out)=0.9 RISE=1
+    let tplh = t_out50_r - t_in50_f
+
+    * 计算平均传输延迟 tp
+    let tp_cur = (tphl + tplh) / 2
+
+    * 将本次循环算出的 ts 和 tp 存入刚才建立的数组中
+    let const.ts_vec[idx] = ts_cur
+    let const.tp_vec[idx] = tp_cur
+
+    let idx = idx + 1
+    let tr_val = tr_val + tr_step
+end
+
+* ==========================================
+* 绘图：复刻书中的曲线
+* ==========================================
+setplot const
+plot tp_vec vs ts_vec title "Rabaey Fig 5.23: tp vs ts" xlabel "Input Slope ts (10-90%)" ylabel "Propagation Delay tp (sec)"
+
+* 导出数据供外部处理 (可选)
+* wrdata ../../results/tp_vs_ts.dat ts_vec tp_vec
+* quit
+.endc
+.end
