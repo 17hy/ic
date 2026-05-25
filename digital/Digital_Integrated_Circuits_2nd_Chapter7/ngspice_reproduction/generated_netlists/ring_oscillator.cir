@@ -1,0 +1,23 @@
+* ring_oscillator: five-stage CMOS ring oscillator
+.include ../models/chapter7_cmos.inc
+Vdd vdd 0 2.5
+X1 n5 n1 vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+X2 n1 n2 vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+X3 n2 n3 vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+X4 n3 n4 vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+X5 n4 n5 vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+C1 n1 0 20f
+C2 n2 0 20f
+C3 n3 0 20f
+C4 n4 0 20f
+C5 n5 0 20f
+.ic v(n1)=0 v(n2)=0 v(n3)=0 v(n4)=0 v(n5)=2.5
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 1p 20n uic
+wrdata ../raw/ring_oscillator.dat time v(n1) v(n2) v(n3) v(n4) v(n5)
+quit
+.endc
+.end

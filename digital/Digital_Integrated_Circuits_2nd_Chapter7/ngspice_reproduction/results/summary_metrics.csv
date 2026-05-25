@@ -1,0 +1,5 @@
+experiment,final_state,q_final_v,qb_final_v,q_min_v,q_max_v,vth_rise_v,vth_fall_v,hysteresis_v,period_ns,frequency_mhz
+bistable_regeneration,Q=0,1.37791528e-09,2.5,,,,,,,
+tg_latch,,,,-0.0454482825,2.57644089,,,,,
+schmitt_trigger,,,,,,1.6000779975032968,0.900027997492551,0.7000500000107458,,
+ring_oscillator,,,,,,,,,0.38007742563665214,2631.0428679760207

@@ -1,0 +1,4 @@
+experiment,tphl_ps,tplh_ps,tp_avg_ps,idd_in0_uA,idd_in1_uA,delta_uA,x_min_v,x_max_v
+static_nand_delay,58.85686933690432,27.29681773792448,43.0768435374144,,,,,
+pseudo_nmos_static_current,,,,2.5099998e-06,688.278377,688.2783744900001,,
+dynamic_nand,,,,,,,1.20916238,2.83624862

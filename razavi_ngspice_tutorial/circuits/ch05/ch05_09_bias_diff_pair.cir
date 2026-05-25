@@ -17,10 +17,17 @@ M2 outn inm tail 0 NMOS W=8u L=0.18u
 set noaskquit
 set wr_singlescale
 set wr_vecnames
+set hcopydevtype=svg
 dc Vdm -0.5 0.5 0.005
 let voutdiff = v(outp) - v(outn)
+plot voutdiff vs v(dm) title "ch05_09 VOD-VDM"
+hardcopy ../../results/ch05_09_bias_diff_pair_dc.svg voutdiff vs v(dm)
 wrdata ../../results/ch05_09_bias_diff_pair_dc.dat v(dm) voutdiff v(tail)
 ac dec 80 10 10G
+plot vdb(outp,outn) title "ch05_09 Differential AC Gain"
+hardcopy ../../results/ch05_09_bias_diff_pair_gain.svg vdb(outp,outn)
+plot {180/PI*vp(outp,outn)} title "ch05_09 Differential AC Phase"
+hardcopy ../../results/ch05_09_bias_diff_pair_phase.svg {180/PI*vp(outp,outn)}
 wrdata ../../results/ch05_09_bias_diff_pair_ac.dat frequency vdb(outp,outn) vp(outp,outn)
 quit
 .endc

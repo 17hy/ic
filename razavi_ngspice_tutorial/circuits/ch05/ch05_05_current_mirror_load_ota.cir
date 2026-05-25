@@ -16,6 +16,7 @@ Vnb nb 0 DC 0.68
 set noaskquit
 set wr_singlescale
 set wr_vecnames
+set hcopydevtype=svg
 
 * ==========================================
 * 1. 直流大信号扫描：差模输入扫描 (Vdm)
@@ -24,9 +25,11 @@ dc Vdm -0.25 0.25 0.002
 
 * 画出大信号传输特性 (Vout vs Vdm)
 plot v(out) vs v(dm) title "Large-Signal VTC (Vout vs Vdm)"
+hardcopy ../../results/ch05_05_current_mirror_load_ota_dc_vtc.svg v(out) vs v(dm)
 
 * 画出差模增益曲线 (这里不加负号，因为是非反相放大)
 plot deriv(v(out)) vs v(dm) title "Differential DC Gain vs Vdm"
+hardcopy ../../results/ch05_05_current_mirror_load_ota_dc_gain.svg deriv(v(out)) vs v(dm)
 
 wrdata ../../results/ch05_05_current_mirror_load_ota_dc.dat v(dm) v(out) v(x) v(tail)
 
@@ -37,12 +40,13 @@ wrdata ../../results/ch05_05_current_mirror_load_ota_dc.dat v(dm) v(out) v(x) v(
 ac dec 80 10 10G
 
 plot vdb(out) title "OTA Open-Loop AC Gain (dB)"
+hardcopy ../../results/ch05_05_current_mirror_load_ota_ac_gain.svg vdb(out)
 plot {180/PI*vp(out)} title "OTA Open-Loop Phase (Degrees)"
+hardcopy ../../results/ch05_05_current_mirror_load_ota_ac_phase.svg {180/PI*vp(out)}
 
 wrdata ../../results/ch05_05_current_mirror_load_ota_ac.dat frequency vdb(out) vp(out)
 
-* 把 quit 注释掉，保留波形窗口
-* quit
+quit
 .endc
 .end
 

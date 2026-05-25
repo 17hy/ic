@@ -1,0 +1,30 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * tg_latch: transmission-gate positive latch
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        2.5
+clk                                          0
+clkb                                       2.5
+d                                            0
+n                                         1.25
+q                                         1.25
+nf                                        1.25
+vd#branch                             2.51e-12
+vclkb#branch                                 0
+vclk#branch                                  0
+vdd#branch                         -0.00063609
+
+
+No. of Data Rows : 5080
+ngspice-46 done

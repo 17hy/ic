@@ -1,0 +1,17 @@
+* pseudo_nmos_vtc: pseudo-NMOS NAND DC
+.include ../models/chapter6_cmos.inc
+Vdd vdd 0 2.5
+Va a 0 0
+Vb b a 0
+Mp out 0 vdd vdd PMOS W=1u L=2.5e-07
+Mn1 out a n1 0 NMOS W=1u L=2.5e-07
+Mn2 n1 b 0 0 NMOS W=1u L=2.5e-07
+.control
+set noaskquit
+set wr_vecnames
+set wr_singlescale
+dc Va 0 2.5 0.0025
+wrdata ../raw/pseudo_nmos_vtc.dat v(a) v(out) i(vdd)
+quit
+.endc
+.end

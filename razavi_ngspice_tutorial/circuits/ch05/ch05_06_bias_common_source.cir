@@ -11,9 +11,14 @@ M1 out in 0 0 NMOS W=4u L=0.18u
 set noaskquit
 set wr_singlescale
 set wr_vecnames
+set hcopydevtype=svg
 op
 print v(out) v(pref) @m1[gm]
 ac dec 80 10 10G
+plot vdb(out) title "ch05_06 AC Gain"
+hardcopy ../../results/ch05_06_bias_common_source_gain.svg vdb(out)
+plot {180/PI*vp(out)} title "ch05_06 AC Phase"
+hardcopy ../../results/ch05_06_bias_common_source_phase.svg {180/PI*vp(out)}
 wrdata ../../results/ch05_06_bias_common_source_ac.dat frequency vdb(out) vp(out)
 quit
 .endc

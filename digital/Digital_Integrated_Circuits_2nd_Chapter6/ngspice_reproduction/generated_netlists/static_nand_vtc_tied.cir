@@ -1,0 +1,18 @@
+* static_nand_vtc_tied: static CMOS NAND DC
+.include ../models/chapter6_cmos.inc
+Vdd vdd 0 2.5
+Va a 0 0
+Vb b a 0
+Mp1 out a vdd vdd PMOS W=2.75u L=2.5e-07
+Mp2 out b vdd vdd PMOS W=2.75u L=2.5e-07
+Mn1 out a n1 0 NMOS W=1u L=2.5e-07
+Mn2 n1 b 0 0 NMOS W=1u L=2.5e-07
+.control
+set noaskquit
+set wr_vecnames
+set wr_singlescale
+dc Va 0 2.5 0.0025
+wrdata ../raw/static_nand_vtc_tied.dat v(a) v(out) i(vdd)
+quit
+.endc
+.end

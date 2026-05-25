@@ -1,0 +1,17 @@
+* bistable_regeneration: cross-coupled inverter regeneration
+.include ../models/chapter7_cmos.inc
+Vdd vdd 0 2.5
+X1 q qb vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+X2 qb q vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+Cq q 0 20f
+Cqb qb 0 20f
+.ic v(q)=1.20 v(qb)=1.30
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 0.5p 2n uic
+wrdata ../raw/bistable_regeneration.dat time v(q) v(qb)
+quit
+.endc
+.end

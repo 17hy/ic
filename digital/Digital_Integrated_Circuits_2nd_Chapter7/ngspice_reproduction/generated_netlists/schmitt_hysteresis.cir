@@ -1,0 +1,16 @@
+* schmitt_hysteresis: ngspice switch Schmitt trigger macro
+Vdd vdd 0 2.5
+Vin in 0 PWL(0 0 0.5u 0 2.5u 2.5 3.2u 2.5 5.2u 0 6u 0)
+Rpu vdd out 2k
+Sdn out 0 in 0 smod
+Cout out 0 20f
+.model smod SW(Ron=120 Roff=1e9 Vt=1.25 Vh=0.35)
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 2n 6u
+wrdata ../raw/schmitt_hysteresis.dat time v(in) v(out)
+quit
+.endc
+.end

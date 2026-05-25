@@ -1,0 +1,25 @@
+* tg_latch: transmission-gate positive latch
+.include ../models/chapter7_cmos.inc
+.subckt tg in out clk clkb vdd
+Mn out clk in 0 NMOS W=1.4u L=2.5e-07
+Mp out clkb in vdd PMOS W=2.8u L=2.5e-07
+.ends tg
+Vdd vdd 0 2.5
+Vclk clk 0 PULSE(0 2.5 0.1n 20p 20p 0.75n 1.5n)
+Vclkb clkb 0 PULSE(2.5 0 0.1n 20p 20p 0.75n 1.5n)
+Vd d 0 PULSE(0 2.5 0.35n 20p 20p 1.1n 2.2n)
+Xin d n clk clkb vdd tg
+Xinv1 n q vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+Xinv2 q nf vdd inv wnn=1u wpp=2.75u lch=2.5e-07
+Xfb nf n clkb clk vdd tg
+Cn n 0 15f
+Cq q 0 25f
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 1p 5n
+wrdata ../raw/tg_latch.dat time v(clk) v(d) v(n) v(q)
+quit
+.endc
+.end

@@ -1,0 +1,19 @@
+* static_nand_tran: static CMOS NAND transient
+.include ../models/chapter6_cmos.inc
+Vdd vdd 0 2.5
+Va a 0 PULSE(0 2.5 0.2n 20p 20p 0.6n 1.2n)
+Vb b 0 2.5
+Mp1 out a vdd vdd PMOS W=2.75u L=2.5e-07
+Mp2 out b vdd vdd PMOS W=2.75u L=2.5e-07
+Mn1 out a n1 0 NMOS W=1u L=2.5e-07
+Mn2 n1 b 0 0 NMOS W=1u L=2.5e-07
+Cload out 0 30f
+.control
+set noaskquit
+set wr_vecnames
+set wr_singlescale
+tran 1p 2.4n
+wrdata ../raw/static_nand_tran.dat time v(a) v(out) i(vdd)
+quit
+.endc
+.end

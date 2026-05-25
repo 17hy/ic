@@ -14,9 +14,12 @@ M4 out4 ref 0 0 NMOS W=20u L=0.18u
 set noaskquit
 set wr_singlescale
 set wr_vecnames
+set hcopydevtype=svg
 op
 print i(vout1) i(vout2) i(vout4) v(ref)
 dc Vout1 0 1.8 0.01
+plot -i(vout1) title "ch05_02 Branch Current (1x)"
+hardcopy ../../results/ch05_02_ratio_current_mirror_vout1.svg -i(vout1)
 wrdata ../../results/ch05_02_ratio_current_mirror_vout1.dat v(out1) i(vout1)
 quit
 .endc

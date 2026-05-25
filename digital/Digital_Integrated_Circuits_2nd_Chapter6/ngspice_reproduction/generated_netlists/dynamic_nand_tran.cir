@@ -1,0 +1,24 @@
+* dynamic_nand_tran: dynamic NAND (precharge/evaluate) with output inverter
+.include ../models/chapter6_cmos.inc
+Vdd vdd 0 2.5
+Vclk clk 0 PULSE(0 2.5 0 20p 20p 0.5n 1n)
+Bclkb clkb 0 v={ 2.5 - v(clk) }
+Va a 0 PULSE(0 2.5 0.1n 20p 20p 1.0n 2.0n)
+Vb b 0 PULSE(0 2.5 0.6n 20p 20p 1.0n 2.0n)
+Mpchg x clkb vdd vdd PMOS W=2.5u L=2.5e-07
+Mn1 x a n1 0 NMOS W=1u L=2.5e-07
+Mn2 n1 b n2 0 NMOS W=1u L=2.5e-07
+Mneval n2 clk 0 0 NMOS W=1u L=2.5e-07
+Minvp y x vdd vdd PMOS W=2.5u L=2.5e-07
+Minvn y x 0 0 NMOS W=1u L=2.5e-07
+Cx x 0 8f
+Cy y 0 20f
+.control
+set noaskquit
+set wr_vecnames
+set wr_singlescale
+tran 1p 4n
+wrdata ../raw/dynamic_nand_tran.dat time v(clk) v(a) v(b) v(x) v(y)
+quit
+.endc
+.end

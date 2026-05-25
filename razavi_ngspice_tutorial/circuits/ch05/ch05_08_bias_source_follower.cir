@@ -11,9 +11,16 @@ M1 vdd in out 0 NMOS W=10u L=0.18u
 set noaskquit
 set wr_singlescale
 set wr_vecnames
+set hcopydevtype=svg
 dc Vin 0.5 1.8 0.005
+plot v(out) vs v(in) title "ch05_08 VOUT-VIN"
+hardcopy ../../results/ch05_08_bias_source_follower_dc.svg v(out) vs v(in)
 wrdata ../../results/ch05_08_bias_source_follower_dc.dat v(in) v(out)
 ac dec 80 10 10G
+plot vdb(out) title "ch05_08 AC Gain"
+hardcopy ../../results/ch05_08_bias_source_follower_gain.svg vdb(out)
+plot {180/PI*vp(out)} title "ch05_08 AC Phase"
+hardcopy ../../results/ch05_08_bias_source_follower_phase.svg {180/PI*vp(out)}
 wrdata ../../results/ch05_08_bias_source_follower_ac.dat frequency vdb(out) vp(out)
 quit
 .endc

@@ -10,7 +10,10 @@ M2 out b2 mid 0 NMOS W=10u L=0.18u
 set noaskquit
 set wr_singlescale
 set wr_vecnames
+set hcopydevtype=svg
 dc Vout 0 1.8 0.005
+plot -i(vout) vs v(out) title "ch05_04 IOUT-VOUT"
+hardcopy ../../results/ch05_04_low_voltage_cascode_mirror.svg -i(vout) vs v(out)
 wrdata ../../results/ch05_04_low_voltage_cascode_mirror.dat v(out) i(vout) v(mid)
 quit
 .endc
