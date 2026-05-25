@@ -1,0 +1,20 @@
+* ch03_04_cs_pmos_active_load: common-source with PMOS current-source load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.72 AC 1m
+Vbp bp 0 DC 1.0
+M1 out in 0 0 NMOS W=4u L=0.18u
+M2 out bp vdd vdd PMOS W=8u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+op
+print v(out) @m1[gm] @m2[gds]
+ac dec 80 10 10G
+wrdata ../../results/ch03_04_cs_pmos_active_load_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

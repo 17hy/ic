@@ -1,0 +1,48 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch01_05_ring_oscillator_5stage: estimate inverter delay from ring oscillator
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        1.8
+n2                                         1.8
+n1                                           0
+n3                                           0
+n4                                         1.8
+n5                                           0
+vdd#branch                         -0.00370656
+
+
+Error: measure  tperiod  trig(TRIG) : bad syntax, cannot evaluate right hand side of val=vexprint1
+Warning from checkvalid: vector tperiod is not available or has zero length.
+Error: RHS "1/tperiod" invalid
+Warning from checkvalid: vector tperiod is not available or has zero length.
+Error: RHS "tperiod/(2*5)" invalid
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+
+No. of Data Rows : 20008
+ meas tran tperiod trig v(n1) val=vexprint1 rise=6 targ v(n1) val=vexprint2 rise=7 failed!
+
+	measure 'finv'  failed
+Error: measure  finv  :
+	no such function as 'param=vexprint3'
+ meas tran finv param=vexprint3 failed!
+
+	measure 'tp_est'  failed
+Error: measure  tp_est  :
+	no such function as 'param=vexprint4'
+ meas tran tp_est param=vexprint4 failed!
+
+Note: Simulation executed from .control section 

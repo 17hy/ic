@@ -1,0 +1,34 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch04_07_gilbert_cell_mixer: six-transistor gilbert cell
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vdd                                        1.8
+rfp                                       0.85
+rfn                                       0.85
+lop                                       0.55
+lon                                       1.15
+outp                                      1.25
+outn                                      1.25
+n1                                    0.443502
+tail                                  0.219746
+n2                                    0.443502
+vlon#branch                                  0
+vlop#branch                                  0
+vrfn#branch                                  0
+vrfp#branch                                  0
+vdd#branch                            -0.00022
+
+
+No. of Data Rows : 5125
+ngspice-46 done

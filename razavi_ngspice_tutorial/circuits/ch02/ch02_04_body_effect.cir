@@ -1,0 +1,29 @@
+* ch02_04_body_effect: current reduction as source-body voltage rises
+.include ../../models/educational_cmos.inc
+
+* 偏置设置：注意这里 Vgs 和 Vds 都是相对于 source 的
+Vgs gate source 0.85
+Vds drain source 1.0
+* 扫描源：改变源极和衬底(0)之间的电压
+Vsb source 0 0
+M1 drain gate source 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+
+* 【核心修改】：强制保存内部跨导参数
+save all @m1[gm]
+
+* 扫描 Vsb 从 0 到 0.7V
+dc Vsb 0 0.7 0.01
+
+* 【新增画图】：注意横坐标现在是 v(source) 即 Vsb
+plot -i(vds) vs v(source) title "Drain Current (Id) vs Vsb"
+plot @m1[gm] vs v(source) title "Transconductance (gm) vs Vsb"
+
+wrdata ../../results/ch02_04_body_effect.dat v(source) i(vds) @m1[gm]
+* quit
+.endc
+.end

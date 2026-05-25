@@ -1,0 +1,110 @@
+190:                     Figure 5.1 shows the circuit diagram of a static CMOS inverter. Its operation is readily
+204:                                                                Figure 5.1 Static CMOS inverter. VDD stands for the
+215:                     transistor is on, while the PMOS is off. This yields the equivalent circuit of Figure 5.2a. A
+218:                     are off and on, respectively. The equivalent circuit of Figure 5.2b shows that a path exists
+238:                                                                                   Figure 5.2   Switch models of CMOS
+298:                     axis and a horizontal shift over VDD. This procedure is outlined in Figure 5.3, where the
+312:                       Figure 5.3 Transforming PMOS I-V characteristic to a common coordinate set
+341:                     Figure 5.4 Load curves for NMOS and PMOS transistors of the static CMOS inverter (VDD = 2.5 V). The dots
+346:                            The resulting load lines are plotted in Figure 5.4. For a dc operating points to be
+383:                                                         NMOS res                       Figure 5.5 VTC of static CMOS inverter,
+390:                                                                                        derived from Figure 5.4 (VDD = 2.5 V). For each
+423:                                                                                       Figure 5.6 Switch model of
+430:                     the transient response by using the simplified switch model again (Figure 5.6). Let us con-
+431:                     sider the low-to-high transition first (Figure 5.6a). The gate response time is simply deter-
+437:                     transition (Figure 5.6b), which is dominated by the RnCL time-constant. The reader should
+456:                     (see Figure 5.5). In this region, both PMOS and NMOS are always saturated, since VDS =
+556:                                         Figure 5.7 plots the values of switching threshold as a function of the PMOS/NMOS
+560:                                 An analysis of the curve of Figure 5.7 produces some interesting observations:
+603:                                                                                                             Figure 5.7 Simulated inverter switching
+639:                             Figure 5.8 Changing the inverter threshold can improve the circuit reliability.
+645:                            Figure 5.8. The incoming signal Vin has a very noisy zero value. Passing this signal
+646:                            through a symmetrical inverter would lead to erroneous values (Figure 5.8a). This
+648:                            response (Figure 5.8b). Further in the text, we will see other circuit instances where
+654:                            Figure 5.7 is plotted in a semi-log format.
+667:                     shown in Figure 5.9. The transition region is approximated by a straight line, the gain of
+688:                                                                                                                                          Figure 5.9 A piece-wise linear
+770:                            Figure 5.10 plots the simulated VTC of the inverter, as well as its derivative, the gain. A close
+774:                                   • Eq. (5.10) overestimates the gain. As observed in Figure 5.10b, the maximum gain (at
+790:                     is very narrow however, as is apparent in the graph of Figure 5.10b. It also receives poor
+839:         Figure 5.10              Simulated Voltage Transfer Characteristic (a) and voltage gain (b) of CMOS inverter (0.25 µm CMOS, VDD
+861:                                apparent in Figure 5.7, which shows that variations in the device sizes have only a minor
+865:                                Figure 5.11: a better-than-expected NMOS combined with an inferior PMOS, and the
+899:                             Good NMOS                                       Figure 5.11 Impact of device variations on static CMOS
+925:                             the threshold voltage of the composing transistors (Figure 5.12a). At a voltage of 0.5 V —
+986:           Figure 5.12             VTC of CMOS inverter as a function of supply voltage (0.25 µm CMOS technology).
+989:                               have plotted in Figure 5.12b the voltage transfer characteristic of the same inverter for the
+1076:                     Figure 5.13    Parasitic capacitances, influencing the transient behavior of the cascaded inverter pair.
+1085:                           Figure 5.13 shows the schematic of a cascaded inverter pair. It includes all the
+1100:                     drain capacitor are moving in opposite directions (Figure 5.14). The voltage change over
+1121:                            Figure 5.14 The Miller effect—A capacitor experiencing identical but opposite voltage swings at both
+1157:                            Consider the inverter of Figure 5.13 designed in the generic 0.25 µm CMOS technology. The
+1159:                                    Let us first analyze the NMOS transistor (Cdb1 in Figure 5.13). The propagation delay
+1231:                            nology. The layout is shown in Figure 5.15. The supply voltage VDD is set to 2.5 V. From the
+1280:                             Figure 5.15 Layout of two chained, minimum-size inverters using SCMOS Design Rules (see also
+1362:                     inverter introduced in Figure 5.6 to derive a reasonable approximation of the propagation
+1417:                            To derive the propagation delays of the CMOS inverter of Figure 5.15, we make use of Eq.
+1457:                                                                                                           Figure 5.16 Simulated transient
+1483:                                on the circuit schematic, extracted from the layout of Figure 5.15. The computed transient
+1484:                                response of the circuit is plotted in Figure 5.16, and determines the propagation delays to be
+1529:                     This analysis is confirmed in Figure 5.17, which plots the propagation delay of the
+1554:                                                                                                                                            Figure 5.17 Propagation delay of CMOS
+1597:                         • Increase VDD. As illustrated in Figure 5.17, the delay of a gate can be modulated by
+1680:                            should equal 1.6. These results are verified in Figure 5.18, which plots the simulated propaga-
+1715:                                                                                              Figure 5.18 Propagation delay of CMOS inverter as a
+1796:                                                                                         Figure 5.19 Increasing inverter performance by
+1800:                                  2            4     6     8     10     12    14         Figure 5.15).
+1805:                                            mance improvement of 1.9 (tp0 = 19.3 psec). From the graph of Figure 5.19, we observe that
+1839:                            Let us consider the circuit of Eq. Figure 5.20. The goal is to minimize the delay
+1846:                Cg1      1                  2                               N                      Figure 5.20 Chain of N inverters with fixed
+1918:                     in Figure 5.21a. For the typical case of γ≈1, the optimum scaler factor turns out to be close
+1919:                     to 3.6. Figure 5.21b plots the (normalized) propagation delay of the inverter chain as a
+1981:          Figure 5.21 Optimizing the number of stages in an inverter chain.
+1997:                       Determine the sizes of the inverters in the circuit of Figure 5.22, such that the delay
+2003:                In                                                           Out                                   Figure 5.22 Inverter network, in which each
+2031:                     total current available for (dis)charging and impacts the propagation delay. Figure 5.23
+2060:                                                                                                            Figure 5.23 tp as a function of the
+2100:                            Consider for instance the circuit of Figure 5.22. With the aid of Eq. (5.31) and Eq. (5.37), we
+2147:                     problem at hand. Consider the circuit of Figure 5.24, where an inverter drives a single
+2158:                                                                            Figure 5.24 Inverter driving single fanout through wire of
+2176:                             Consider the circuit of Figure 5.24, and assume the device parameters of Example 5.5: Cint =
+2228:                     of Figure 5.25 is valid. The values of the energy
+2232:                     the instantaneous power over the period of interest.           Figure 5.25 Equivalent circuit
+2234:                     are pictured in Figure 5.26.
+2285:                                   Charge               Discharge              t        Figure 5.26 Output voltages and supply
+2366:                     equivalent to a transition probabil-        Figure 5.27 Clock and signal waveforms
+2383:                     tion from 5 W to 1.25 W. This assumes that the same clock rate can be sustained. Figure 5.17
+2418:                            assume that the inverter itself is driven by a      Figure 5.28 CMOS inverter driving an external
+2419:                            minimum-sized device (Figure 5.28). The             load capacitance Cext, while being driven by a
+2468:                                        in Figure 5.29a for different values of F. Those curves show a clear minimum. Increasing the
+2508:          Figure 5.29 Sizing of an inverter for energy-minimization. (a) Required supply voltage as a function of the sizing factor f
+2530:                            in Figure 5.29b, from which a number of conclusions can be drawn:
+2550:                     transistors are conducting simultaneously. This is illustrated in Figure 5.30. Under the
+2591:                       Figure 5.30      Short-circuit currents during transients.
+2602:                     cantly larger than the input rise time (Figure 5.31a). Under those circumstances, the input
+2620:                     Figure 5.31 Impact of load capacitance on short-circuit current.
+2627:                     fall time is substantially smaller than the input rise time (Figure 5.31b). The drain-source
+2639:                     in Figure 5.32, which plots the short-circuit current through the NMOS transistor during a
+2668:                                                                                            Figure 5.32 CMOS inverter short-circuit current
+2692:                     shown in Figure 5.33, which plots the short-circuit energy dissipation of an inverter (normal-
+2730:                                                                                       Figure 5.33 Power dissipation of a static CMOS
+2764:                     tors, located between the source or drain and the substrate as shown in Figure 5.34. This
+2792:                                                  Subthreshold current       Figure 5.34 Sources of leakage currents in
+2801:                     when VGS is smaller than the threshold voltage (Figure 5.35). The closer the threshold
+2808:                     cluded earlier (Figure 5.17) that scaling the supply voltages while keeping the threshold
+2811:                     thresholds down as well. This moves the curve of Figure 5.17 to the left, which means that
+2814:                     current, as demonstrated in Figure 5.35. The choice of the threshold voltage hence repre-
+2845:                                                                                      Figure 5.35 Decreasing the threshold
+2968:                            Hence, VDDopt = (3/2) × 0.8 V = 1.2 V. The simulated graphs of Figure 5.36, plotting normal-
+2994:                                                                                                                Figure 5.36 Normalized delay, energy,
+3044:                           Consider, for instance, the circuit of Figure 5.37. The current delivered by the power
+3071:                             pF). The resulting power consumption is plotted in Figure 5.38, showing an average power
+3093:                     Figure 5.37 Equivalent circuit to measure average power in SPICE.
+3100:                                         Figure 5.16).
+3128:                                                                                                                          Figure 5.38 Deriving the power
+3174:                     From Figure 5.39, we can derive that the gate
+3182:                     1960s to a tenth of a nanosecond in the year Figure 5.39 Scaling of the gate delay (from
+3187:                     esting chart is shown in Figure 5.40, which plots the power density measured over a large
+3221:                                                                                        Figure 5.40 Evolution of power-density in
+3248:                     ple of which is shown in Figure 5.41. How the ratio of wire over intrinsic contributions
+3265:                                                                      Figure 5.41 Evolution of wire delay / gate delay ratio

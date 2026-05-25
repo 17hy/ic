@@ -1,0 +1,15 @@
+* vtc_vdd_1p0: CMOS inverter DC transfer curve
+.include ../models/chapter5_cmos.inc
+Vdd vdd 0 1
+Vin in 0 0
+Xinv in out vdd inv wnn=1e-06 wpp=2.75e-06 lch=2.5e-07
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vin 0 1 0.0016666667
+wrdata ../raw/vtc_vdd_1p0.dat v(in) v(out) i(vdd)
+quit
+.endc
+.end

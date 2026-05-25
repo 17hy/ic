@@ -1,0 +1,24 @@
+* ch04_03_diff_pair_common_mode: common-mode response with finite tail resistance
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vcm cm 0 DC 0.85 AC 1m
+Vdm dm 0 DC 0 AC 0
+Bip inp 0 v={v(cm)+v(dm)/2}
+Bin inm 0 v={v(cm)-v(dm)/2}
+Rd1 vdd outp 8k
+Rd2 vdd outn 8k
+Rtail tail 0 250k
+Itail tail 0 DC 160u
+M1 outp inp tail 0 NMOS W=8u L=0.18u
+M2 outn inm tail 0 NMOS W=8u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+ac dec 80 10 10G
+wrdata ../../results/ch04_03_diff_pair_common_mode.dat frequency vdb(outp) vp(outp)
+quit
+.endc
+.end
+

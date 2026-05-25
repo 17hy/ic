@@ -1,0 +1,19 @@
+* ch03_03_cs_current_source_load: common-source with ideal current-source load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.72 AC 1m
+Iload vdd out DC 160u
+M1 out in 0 0 NMOS W=4u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+op
+print v(out) @m1[gm] @m1[gds]
+ac dec 80 10 10G
+wrdata ../../results/ch03_03_cs_current_source_load_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

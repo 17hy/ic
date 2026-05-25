@@ -1,0 +1,25 @@
+* ch04_06_current_mirror_load_diff_pair: active current mirror load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vcm cm 0 DC 0.85
+Vdm dm 0 DC 0 AC 1m
+Bip inp 0 v={v(cm)+v(dm)/2}
+Bin inm 0 v={v(cm)-v(dm)/2}
+M1 x inp tail 0 NMOS W=8u L=0.18u
+M2 out inm tail 0 NMOS W=8u L=0.18u
+M3 x x vdd vdd PMOS W=10u L=0.18u
+M4 out x vdd vdd PMOS W=10u L=0.18u
+Itail tail 0 DC 160u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vdm -0.3 0.3 0.002
+wrdata ../../results/ch04_06_current_mirror_load_diff_pair_dc.dat v(dm) v(out) v(x)
+ac dec 80 10 10G
+wrdata ../../results/ch04_06_current_mirror_load_diff_pair_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

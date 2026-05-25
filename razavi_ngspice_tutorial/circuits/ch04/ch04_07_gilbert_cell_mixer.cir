@@ -1,0 +1,28 @@
+* ch04_07_gilbert_cell_mixer: six-transistor Gilbert cell
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vrfp rfp 0 SIN(0.85 5m 20Meg)
+Vrfn rfn 0 SIN(0.85 5m 20Meg 0 0 180)
+Vlop lop 0 PULSE(0.55 1.15 0 0.5n 0.5n 25n 50n)
+Vlon lon 0 PULSE(1.15 0.55 0 0.5n 0.5n 25n 50n)
+Rd1 vdd outp 5k
+Rd2 vdd outn 5k
+M1 n1 rfp tail 0 NMOS W=12u L=0.18u
+M2 n2 rfn tail 0 NMOS W=12u L=0.18u
+M3 outp lop n1 0 NMOS W=8u L=0.18u
+M4 outn lon n1 0 NMOS W=8u L=0.18u
+M5 outp lon n2 0 NMOS W=8u L=0.18u
+M6 outn lop n2 0 NMOS W=8u L=0.18u
+Itail tail 0 DC 220u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 0.1n 500n
+let voutdiff = v(outp) - v(outn)
+wrdata ../../results/ch04_07_gilbert_cell_mixer_tran.dat time v(rfp) v(lop) voutdiff
+quit
+.endc
+.end
+

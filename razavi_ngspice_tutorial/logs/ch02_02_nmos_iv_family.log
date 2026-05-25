@@ -1,0 +1,16 @@
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch02_02_nmos_iv_family: id-vds family with vgs stepping
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 905
+Note: Simulation executed from .control section 

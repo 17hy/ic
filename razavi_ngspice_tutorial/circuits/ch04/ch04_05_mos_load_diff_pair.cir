@@ -1,0 +1,26 @@
+* ch04_05_mos_load_diff_pair: differential pair with PMOS current-source loads
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vcm cm 0 DC 0.85
+Vdm dm 0 DC 0 AC 1m
+Vbp bp 0 DC 1.05
+Bip inp 0 v={v(cm)+v(dm)/2}
+Bin inm 0 v={v(cm)-v(dm)/2}
+M1 outp inp tail 0 NMOS W=8u L=0.18u
+M2 outn inm tail 0 NMOS W=8u L=0.18u
+M3 outp bp vdd vdd PMOS W=10u L=0.18u
+M4 outn bp vdd vdd PMOS W=10u L=0.18u
+Itail tail 0 DC 160u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+op
+print v(outp) v(outn)
+ac dec 80 10 10G
+wrdata ../../results/ch04_05_mos_load_diff_pair_ac.dat frequency vdb(outp,outn) vp(outp,outn)
+quit
+.endc
+.end
+

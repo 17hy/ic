@@ -1,0 +1,33 @@
+* ch02_03_gm_ro_trans: transient version to extract gm and ro
+.include ../../models/educational_cmos.inc
+
+* 1. 将直流源改成随时间线性增长的脉冲源 (PULSE)
+* 语法：PULSE(初值 终值 延迟 上升时间 下降时间 脉宽 周期)
+* 这里让电压在 5ms 内从 0.45V 线性上升到 1.25V
+Vgs gate 0 PULSE(0.45 1.25 0 5m 0 1m 6m)
+Vds drain 0 1.2
+M1 drain gate 0 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+
+* 2. 核心修复：同样需要保存微观参数
+save all @m1[gm] @m1[gds]
+
+* 3. 运行瞬态仿真：步长 10us，总时间 5ms
+tran 10u 5m
+
+* 4. 计算 ro
+let ro = 1 / @m1[gds]
+
+* 5. 【关键】：绘图时，依然以 v(gate) 作为 X 轴！
+* 默认 plot 是以时间为 X 轴，加上 "vs v(gate)" 就能画出和 DC 扫描完全一模一样的曲线
+plot -i(vds) vs v(gate) title "Id vs Vgs (Transient)"
+plot @m1[gm] vs v(gate) title "gm vs Vgs (Transient)"
+plot ro vs v(gate) title "ro vs Vgs (Transient)"
+
+wrdata ../../results/ch02_03_gm_ro_trans.dat v(gate) i(vds) @m1[gm] @m1[gds] ro
+.endc
+.end

@@ -1,0 +1,12 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch04_03_diff_pair_common_mode: common-mode response with finite tail resistance
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 721
+ngspice-46 done

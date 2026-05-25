@@ -1,0 +1,21 @@
+* ch05_08_bias_source_follower: mirror-biased source follower
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 1.0 AC 1m
+Iref vdd nref DC 100u
+Mref nref nref 0 0 NMOS W=10u L=0.18u
+Msink out nref 0 0 NMOS W=10u L=0.18u
+M1 vdd in out 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vin 0.5 1.8 0.005
+wrdata ../../results/ch05_08_bias_source_follower_dc.dat v(in) v(out)
+ac dec 80 10 10G
+wrdata ../../results/ch05_08_bias_source_follower_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

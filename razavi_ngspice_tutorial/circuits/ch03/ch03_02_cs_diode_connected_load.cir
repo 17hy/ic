@@ -1,0 +1,39 @@
+* ch03_02_cs_diode_connected_load: common-source with diode-connected PMOS load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.72 AC 1m
+M1 out in 0 0 NMOS W=4u L=0.18u
+M2 out out vdd vdd PMOS W=8u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+
+* ==========================================
+* 1. DC 扫描：提取 VTC 曲线与增益
+* ==========================================
+dc Vin 0 1.8 0.005
+
+plot v(out) vs v(in) title "VTC: Diode-Connected Load"
+plot -deriv(v(out)) vs v(in) title "DC Gain: Diode-Connected Load"
+
+wrdata ../../results/ch03_02_cs_diode_connected_load_dc.dat v(in) v(out) i(vdd)
+
+* ==========================================
+* 2. AC 扫描：提取波特图
+* ==========================================
+ac dec 80 10 10G
+
+let gain_db = vdb(out)-vdb(in)
+let phase_deg = 180/PI*(vp(out)-vp(in))
+
+plot gain_db title "AC Voltage Gain (dB)"
+plot phase_deg title "AC Phase Shift (Degrees)"
+
+wrdata ../../results/ch03_02_cs_diode_connected_load_ac.dat gain_db phase_deg
+
+* quit
+.endc
+.end
+

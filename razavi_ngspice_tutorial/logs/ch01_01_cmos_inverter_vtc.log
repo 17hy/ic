@@ -1,0 +1,23 @@
+Error: Bad syntax! in   .dc vin 0 vdd 0.002
+
+dc simulation(s) aborted
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+Error: no such vector in
+  in term: v(in)
+
+Error: incomplete or empty netlist
+       or no ".plot", ".print", or ".fourier" lines in batch mode;
+no simulations run!
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch01_01_cmos_inverter_vtc: cmos inverter dc transfer characteristic
+

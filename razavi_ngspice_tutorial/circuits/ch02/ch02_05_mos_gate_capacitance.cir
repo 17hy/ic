@@ -1,0 +1,17 @@
+* ch02_05_mos_gate_capacitance: estimate gate capacitance from AC current
+.include ../../models/educational_cmos.inc
+Vgate gate 0 DC 0.9 AC 1
+M1 0 gate 0 0 NMOS W=40u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+ac dec 40 1k 1g
+let cgate = abs(imag(i(vgate))) / (6.283185307 * frequency)
+plot cgate xlog title "Gate Capacitance vs Frequency"
+wrdata ../../results/ch02_05_mos_gate_capacitance.dat frequency cgate
+
+.endc
+.end
+

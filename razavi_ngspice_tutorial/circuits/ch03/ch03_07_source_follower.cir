@@ -1,0 +1,19 @@
+* ch03_07_source_follower: common-drain source follower
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.95 AC 1m
+Ibias out 0 DC 120u
+M1 vdd in out 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vin 0.45 1.8 0.005
+wrdata ../../results/ch03_07_source_follower_dc.dat v(in) v(out)
+ac dec 80 10 10G
+wrdata ../../results/ch03_07_source_follower_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

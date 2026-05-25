@@ -1,0 +1,20 @@
+* ch05_03_cascode_current_mirror: self-biased cascode current mirror
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Iref vdd ref_top DC 80u
+Vout out 0 DC 1.2
+M1 ref_mid ref_mid 0 0 NMOS W=10u L=0.18u
+M3 ref_top ref_top ref_mid 0 NMOS W=10u L=0.18u
+M2 out_mid ref_mid 0 0 NMOS W=10u L=0.18u
+M4 out ref_top out_mid 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vout 0 1.8 0.005
+wrdata ../../results/ch05_03_cascode_current_mirror.dat v(out) i(vout) v(ref_mid) v(ref_top)
+quit
+.endc
+.end
+

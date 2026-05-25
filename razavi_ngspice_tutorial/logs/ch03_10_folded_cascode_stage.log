@@ -1,0 +1,21 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch03_10_folded_cascode_stage: simplified folded-cascode branch
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+v(out) = -5.81875e+07
+v(fold) = 1.402041e+00
+@m1[gm] = 1.468056e-03
+@m2[gds] = 2.033596e-10
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 721
+ngspice-46 done

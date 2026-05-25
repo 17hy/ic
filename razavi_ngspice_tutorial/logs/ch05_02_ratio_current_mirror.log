@@ -1,0 +1,21 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * ch05_02_ratio_current_mirror: 1x, 2x, and 4x mirror branches
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+i(vout1) = -5.16249e-05
+i(vout2) = -1.03250e-04
+i(vout4) = -2.06500e-04
+v(ref) = 5.750757e-01
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 181
+ngspice-46 done

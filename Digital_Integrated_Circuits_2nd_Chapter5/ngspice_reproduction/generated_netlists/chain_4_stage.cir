@@ -1,0 +1,19 @@
+* chain_4_stage: 4-stage inverter buffer chain
+.include ../models/chapter5_cmos.inc
+Vdd vdd 0 2.5
+Vin in 0 PULSE(0 2.5 0.2n 20p 20p 1n 2n)
+X1 in n1 vdd inv wnn=1e-06 wpp=2.75e-06 lch=2.5e-07
+X2 n1 n2 vdd inv wnn=4.2728701e-06 wpp=1.1750393e-05 lch=2.5e-07
+X3 n2 n3 vdd inv wnn=1.8257419e-05 wpp=5.0207901e-05 lch=2.5e-07
+X4 n3 out vdd inv wnn=7.8011577e-05 wpp=0.00021453184 lch=2.5e-07
+Cload out 0 1e-12
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 1p 10n
+wrdata ../raw/chain_4_stage.dat time v(in) v(out) i(vdd)
+quit
+.endc
+.end

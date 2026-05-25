@@ -1,0 +1,22 @@
+* ch03_10_folded_cascode_stage: simplified folded-cascode branch
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.72 AC 1m
+Vbp bp 0 DC 0.85
+Ibias vdd fold DC 260u
+Iout out 0 DC 120u
+M1 fold in 0 0 NMOS W=4u L=0.18u
+M2 out bp fold vdd PMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+op
+print v(out) v(fold) @m1[gm] @m2[gds]
+ac dec 80 10 10G
+wrdata ../../results/ch03_10_folded_cascode_stage_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

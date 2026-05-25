@@ -1,0 +1,16 @@
+* power_freq_250m: CMOS inverter transient response
+.include ../models/chapter5_cmos.inc
+Vdd vdd 0 2.5
+Vin in 0 PULSE(0 2.5 4e-10 2e-11 2e-11 1.8e-09 4e-09)
+Xinv in out vdd inv wnn=1e-06 wpp=2.75e-06 lch=2.5e-07
+Cload out 0 1e-13
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 2e-12 4.04e-08
+wrdata ../raw/power_freq_250m.dat time v(in) v(out) i(vdd)
+quit
+.endc
+.end

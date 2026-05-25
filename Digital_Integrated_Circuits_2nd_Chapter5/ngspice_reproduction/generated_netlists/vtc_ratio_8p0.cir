@@ -1,0 +1,15 @@
+* vtc_ratio_8p0: CMOS inverter DC transfer curve
+.include ../models/chapter5_cmos.inc
+Vdd vdd 0 2.5
+Vin in 0 0
+Xinv in out vdd inv wnn=1e-06 wpp=8e-06 lch=2.5e-07
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vin 0 2.5 0.0041666667
+wrdata ../raw/vtc_ratio_8p0.dat v(in) v(out) i(vdd)
+quit
+.endc
+.end

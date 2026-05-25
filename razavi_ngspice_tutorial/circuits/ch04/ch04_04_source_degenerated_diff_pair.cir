@@ -1,0 +1,26 @@
+* ch04_04_source_degenerated_diff_pair: differential pair with source degeneration
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vcm cm 0 DC 0.95
+Vdm dm 0 DC 0
+Bip inp 0 v={v(cm)+v(dm)/2}
+Bin inm 0 v={v(cm)-v(dm)/2}
+Rd1 vdd outp 7k
+Rd2 vdd outn 7k
+Rs1 s1 tail 600
+Rs2 s2 tail 600
+M1 outp inp s1 0 NMOS W=12u L=0.18u
+M2 outn inm s2 0 NMOS W=12u L=0.18u
+Itail tail 0 DC 180u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vdm -1.0 1.0 0.005
+let voutdiff = v(outp) - v(outn)
+wrdata ../../results/ch04_04_source_degenerated_diff_pair.dat v(dm) voutdiff v(outp) v(outn)
+quit
+.endc
+.end
+

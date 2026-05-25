@@ -1,0 +1,18 @@
+* ch05_01_basic_current_mirror: basic NMOS current mirror output curve
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Iref vdd ref DC 100u
+Vout out 0 DC 1.0
+M1 ref ref 0 0 NMOS W=10u L=0.18u
+M2 out ref 0 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vout 0 1.8 0.005
+wrdata ../../results/ch05_01_basic_current_mirror.dat v(out) i(vout) v(ref)
+quit
+.endc
+.end
+

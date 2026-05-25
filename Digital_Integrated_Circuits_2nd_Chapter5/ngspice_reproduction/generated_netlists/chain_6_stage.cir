@@ -1,0 +1,21 @@
+* chain_6_stage: 6-stage inverter buffer chain
+.include ../models/chapter5_cmos.inc
+Vdd vdd 0 2.5
+Vin in 0 PULSE(0 2.5 0.2n 20p 20p 1n 2n)
+X1 in n1 vdd inv wnn=1e-06 wpp=2.75e-06 lch=2.5e-07
+X2 n1 n2 vdd inv wnn=2.6331754e-06 wpp=7.2412324e-06 lch=2.5e-07
+X3 n2 n3 vdd inv wnn=6.9336127e-06 wpp=1.9067435e-05 lch=2.5e-07
+X4 n3 n4 vdd inv wnn=1.8257419e-05 wpp=5.0207901e-05 lch=2.5e-07
+X5 n4 n5 vdd inv wnn=4.8074986e-05 wpp=0.00013220621 lch=2.5e-07
+X6 n5 out vdd inv wnn=0.00012658987 wpp=0.00034812214 lch=2.5e-07
+Cload out 0 1e-12
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+tran 1p 10n
+wrdata ../raw/chain_6_stage.dat time v(in) v(out) i(vdd)
+quit
+.endc
+.end

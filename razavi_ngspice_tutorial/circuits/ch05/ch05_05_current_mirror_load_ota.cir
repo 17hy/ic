@@ -1,0 +1,48 @@
+* ch05_05_current_mirror_load_ota: five-transistor OTA with PMOS mirror load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vcm cm 0 DC 0.85
+Vdm dm 0 DC 0 AC 1m
+Bip inp 0 v={v(cm)+v(dm)/2}
+Bin inm 0 v={v(cm)-v(dm)/2}
+M1 x inp tail 0 NMOS W=8u L=0.18u
+M2 out inm tail 0 NMOS W=8u L=0.18u
+M3 x x vdd vdd PMOS W=10u L=0.18u
+M4 out x vdd vdd PMOS W=10u L=0.18u
+M5 tail nb 0 0 NMOS W=12u L=0.18u
+Vnb nb 0 DC 0.68
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+
+* ==========================================
+* 1. 直流大信号扫描：差模输入扫描 (Vdm)
+* ==========================================
+dc Vdm -0.25 0.25 0.002
+
+* 画出大信号传输特性 (Vout vs Vdm)
+plot v(out) vs v(dm) title "Large-Signal VTC (Vout vs Vdm)"
+
+* 画出差模增益曲线 (这里不加负号，因为是非反相放大)
+plot deriv(v(out)) vs v(dm) title "Differential DC Gain vs Vdm"
+
+wrdata ../../results/ch05_05_current_mirror_load_ota_dc.dat v(dm) v(out) v(x) v(tail)
+
+* ==========================================
+* 2. 交流小信号扫描：提取开环波特图
+* ==========================================
+* 注意：SPICE 会自动在 Vdm=0 (即 Vinp=Vinm=0.85V) 处计算静态工作点
+ac dec 80 10 10G
+
+plot vdb(out) title "OTA Open-Loop AC Gain (dB)"
+plot {180/PI*vp(out)} title "OTA Open-Loop Phase (Degrees)"
+
+wrdata ../../results/ch05_05_current_mirror_load_ota_ac.dat frequency vdb(out) vp(out)
+
+* 把 quit 注释掉，保留波形窗口
+* quit
+.endc
+.end
+

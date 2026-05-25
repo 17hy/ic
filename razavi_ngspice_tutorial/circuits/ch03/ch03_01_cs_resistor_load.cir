@@ -1,0 +1,45 @@
+* ch03_01_cs_resistor_load: common-source amplifier with resistor load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.72 AC 1m
+Rd vdd out 6k
+M1 out in 0 0 NMOS W=4u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+
+* ==========================================
+* 1. 执行直流扫描 (DC Sweep) 提取 VTC 曲线
+* ==========================================
+dc Vin 0 1.8 0.005
+
+* 画出电压传输特性曲线 (Vout vs Vin)
+plot v(out) vs v(in) title "Voltage Transfer Characteristic (VTC)"
+
+* 【进阶福利】：画出直流增益曲线 (Vout 对 Vin 的斜率倒转)
+* deriv() 函数会对曲线求导，这能极其直观地看到哪里放大倍数最高
+plot -deriv(v(out)) vs v(in) title "DC Gain vs Vin"
+
+wrdata ../../results/ch03_01_cs_resistor_load_dc.dat v(in) v(out) i(vdd)
+
+* ==========================================
+* 2. 执行交流扫描 (AC Sweep) 提取波特图
+* ==========================================
+ac dec 80 10 10G
+
+* 画出幅频特性曲线 (单位：分贝 dB)
+plot vdb(out) title "AC Voltage Gain Magnitude (dB)"
+
+* 画出相频特性曲线 (单位：度)
+* vp(out) 默认输出弧度，乘以 180/PI 转换为我们习惯的角度
+plot {180/PI*vp(out)} title "AC Phase Shift (Degrees)"
+
+wrdata ../../results/ch03_01_cs_resistor_load_ac.dat frequency vdb(out) vp(out)
+
+* 【删除/注释 quit 以保留波形窗口】
+* quit
+.endc
+.end
+

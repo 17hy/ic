@@ -1,0 +1,20 @@
+* ch03_05_cs_triode_load: common-source with PMOS biased in triode as load
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 DC 0.72 AC 1m
+Vgload gload 0 DC 0.25
+M1 out in 0 0 NMOS W=4u L=0.18u
+M2 out gload vdd vdd PMOS W=6u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vin 0 1.8 0.005
+wrdata ../../results/ch03_05_cs_triode_load_dc.dat v(in) v(out) i(vdd)
+ac dec 80 10 10G
+wrdata ../../results/ch03_05_cs_triode_load_ac.dat frequency vdb(out) vp(out)
+quit
+.endc
+.end
+

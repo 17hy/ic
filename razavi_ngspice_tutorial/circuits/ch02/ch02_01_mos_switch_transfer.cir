@@ -1,0 +1,17 @@
+* ch02_01_mos_switch_transfer: NMOS switch transfer curve
+.include ../../models/educational_cmos.inc
+Vdd vdd 0 {VDD}
+Vin in 0 0
+Rload vdd out 10k
+M1 out in 0 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+dc Vin 0 1.8 0.01
+* 画出 Vout 随 Vin 变化的曲线
+plot v(out) vs v(in)
+* 画出 Vdd 电流随 Vin 变化的曲线（注意电流方向通常是负的，可以加负号反转）
+plot -i(vdd) vs v(in)
+.endc
+.end
+

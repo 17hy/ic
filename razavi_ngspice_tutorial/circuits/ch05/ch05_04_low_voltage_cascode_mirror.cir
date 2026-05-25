@@ -1,0 +1,18 @@
+* ch05_04_low_voltage_cascode_mirror: externally biased low-voltage cascode mirror
+.include ../../models/educational_cmos.inc
+Vout out 0 DC 1.0
+Vb1 b1 0 DC 0.72
+Vb2 b2 0 DC 1.02
+M1 mid b1 0 0 NMOS W=10u L=0.18u
+M2 out b2 mid 0 NMOS W=10u L=0.18u
+
+.control
+set noaskquit
+set wr_singlescale
+set wr_vecnames
+dc Vout 0 1.8 0.005
+wrdata ../../results/ch05_04_low_voltage_cascode_mirror.dat v(out) i(vout) v(mid)
+quit
+.endc
+.end
+
