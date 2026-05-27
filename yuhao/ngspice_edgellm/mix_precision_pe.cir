@@ -1,0 +1,34 @@
+* EdgeLLM mixed-precision PE behavioral PPA model
+* Voltages represent normalized architectural metrics from Fig. 4 / Table I.
+
+.param tin=128
+.param ffn_int4_w_bits={tin*4}
+.param mha_fp16_kv_bits={(tin/4)*16}
+.param ffn_error_pct=0.0472
+.param mha_error_pct=0.0044
+.param this_area=71664
+.param base1_area=107437
+.param base2_area=140677
+.param ffn_power_mw=40.34
+.param mha_power_mw=10.39
+.param max_freq_ghz=1.11
+
+Bffnw ffn_weight_bits_per_group 0 V={ffn_int4_w_bits}
+Bmhaw mha_kv_bits_per_group 0 V={mha_fp16_kv_bits}
+Bmatch bandwidth_match_ratio 0 V={ffn_int4_w_bits/mha_fp16_kv_bits}
+Bffnerr ffn_error_percent 0 V={ffn_error_pct}
+Bmhaerr mha_error_percent 0 V={mha_error_pct}
+Barea1 area_saving_vs_fp16tree_pct 0 V={(base1_area-this_area)/base1_area*100}
+Barea2 area_saving_vs_fp20tree_pct 0 V={(base2_area-this_area)/base2_area*100}
+Bffnp ffn_power_mw_node 0 V={ffn_power_mw}
+Bmhap mha_power_mw_node 0 V={mha_power_mw}
+Bfreq max_freq_ghz_node 0 V={max_freq_ghz}
+
+.op
+.control
+run
+print v(ffn_weight_bits_per_group) v(mha_kv_bits_per_group) v(bandwidth_match_ratio) v(ffn_error_percent) v(mha_error_percent) v(area_saving_vs_fp16tree_pct) v(area_saving_vs_fp20tree_pct) v(ffn_power_mw_node) v(mha_power_mw_node) v(max_freq_ghz_node)
+wrdata mix_precision_pe_op.csv v(ffn_weight_bits_per_group) v(mha_kv_bits_per_group) v(bandwidth_match_ratio) v(ffn_error_percent) v(mha_error_percent) v(area_saving_vs_fp16tree_pct) v(area_saving_vs_fp20tree_pct) v(ffn_power_mw_node) v(mha_power_mw_node) v(max_freq_ghz_node)
+quit
+.endc
+.end

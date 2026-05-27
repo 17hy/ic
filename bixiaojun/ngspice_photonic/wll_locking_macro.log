@@ -1,0 +1,20 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * wll il-adjustable wavelength-locking macro model
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 2902
+lock_err_pre        =  -4.00791e-14
+lock_err_post       =  -2.60125e-13
+gain_after          =  1.61290e+00
+lock_err_pre = -4.00790e-14
+lock_err_post = -2.60125e-13
+gain_after = 1.612903e+00
+ngspice-46 done

@@ -1,0 +1,42 @@
+* Simplified switched ISDB DC-DC power-stage model
+* Based on ISSCC 2026 paper Fig. 19.9.2/19.9.3.
+* This is an idealized topology-level model, not a transistor-level HV SOI/BCD reproduction.
+*
+* Scenario: VREC=60 V, VOUT=5 V, IOUT about 0.4 A, CCM.
+* Each branch sees only VREC/2=30 V. D ~= (VOUT - IOUT/2*DCR_L)/(VREC/2)
+* for this idealized source-plus-series-DCR macro orientation.
+
+.options method=gear reltol=1e-5 abstol=1e-10 vntol=1e-6
+.param vrec=60
+.param vinhalf={vrec/2}
+.param fsw=2e6
+.param tper={1/fsw}
+.param iout=0.4
+.param vtarget=5
+.param rdcr=0.324
+.param duty={(vtarget-iout/2*rdcr)/vinhalf}
+.param load={vtarget/iout}
+
+VSW1 sw1 0 PULSE(0 {vinhalf} 0 2n 2n {duty*tper} {tper})
+VSW2 sw2 0 PULSE(0 {vinhalf} {tper/2} 2n 2n {duty*tper} {tper})
+L1 sw1 l1x 10u IC={iout/2}
+RDCR1 l1x out {rdcr}
+L2 sw2 l2x 10u IC={iout/2}
+RDCR2 l2x out {rdcr}
+COUT out 0 2.2u IC={vtarget}
+RLOAD out 0 {load}
+
+.tran 20n 2m 1.5m 20n uic
+.control
+run
+meas tran avg_vout AVG v(out) from=1.5m to=2m
+meas tran pp_vout PP v(out) from=1.5m to=2m
+meas tran avg_il1 AVG i(L1) from=1.5m to=2m
+meas tran avg_il2 AVG i(L2) from=1.5m to=2m
+meas tran pp_il1 PP i(L1) from=1.5m to=2m
+meas tran pp_il2 PP i(L2) from=1.5m to=2m
+print avg_vout pp_vout avg_il1 avg_il2 pp_il1 pp_il2
+wrdata isdb_60v_5v_transient.csv time v(sw1) v(sw2) v(out) i(L1) i(L2)
+quit
+.endc
+.end

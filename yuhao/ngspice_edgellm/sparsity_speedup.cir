@@ -1,0 +1,27 @@
+* EdgeLLM log-scale structured sparsity behavioral model
+* Voltages represent effective bit-width and ideal throughput gain.
+
+.param dense_bw=4.125
+.param sparse50_bw=3.125
+.param sparse75_bw=1.875
+.param sparse875_onehot_bw=1.625
+.param sparse875_addr_bw=1.125
+
+Bdense dense_effective_bitwidth 0 V={dense_bw}
+Bsp50 sparse50_effective_bitwidth 0 V={sparse50_bw}
+Bsp75 sparse75_effective_bitwidth 0 V={sparse75_bw}
+Bsp875oh sparse875_onehot_effective_bitwidth 0 V={sparse875_onehot_bw}
+Bsp875 sparse875_effective_bitwidth 0 V={sparse875_addr_bw}
+Bspeed50 speedup_50pct 0 V={dense_bw/sparse50_bw}
+Bspeed75 speedup_75pct 0 V={dense_bw/sparse75_bw}
+Bspeed875oh speedup_875pct_onehot 0 V={dense_bw/sparse875_onehot_bw}
+Bspeed875 speedup_875pct_addr 0 V={dense_bw/sparse875_addr_bw}
+
+.op
+.control
+run
+print v(dense_effective_bitwidth) v(sparse50_effective_bitwidth) v(sparse75_effective_bitwidth) v(sparse875_onehot_effective_bitwidth) v(sparse875_effective_bitwidth) v(speedup_50pct) v(speedup_75pct) v(speedup_875pct_onehot) v(speedup_875pct_addr)
+wrdata sparsity_speedup_op.csv v(dense_effective_bitwidth) v(sparse50_effective_bitwidth) v(sparse75_effective_bitwidth) v(sparse875_onehot_effective_bitwidth) v(sparse875_effective_bitwidth) v(speedup_50pct) v(speedup_75pct) v(speedup_875pct_onehot) v(speedup_875pct_addr)
+quit
+.endc
+.end

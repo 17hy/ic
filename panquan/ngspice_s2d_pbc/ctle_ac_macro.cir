@@ -1,0 +1,41 @@
+* Cascaded CTLE small-signal macro model
+* Purpose: reproduce the qualitative effect of emitter degeneration plus
+* distributed/shunt peaking: higher high-frequency boost and extended peaking.
+* It is a topology-level model, not a 130-nm SiGe device-level model.
+
+.options reltol=1e-6 abstol=1e-12 vntol=1e-8
+.param gm=0.04
+.param re=80
+.param ce=300f
+.param rload=200
+.param cload=6f
+.param lpk=60p
+.param tiny_l=1f
+
+Vin in 0 AC 1
+
+* Path A: two cascaded CTLE stages with practical small distributed peaking.
+Xpa in p1 ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} cload={cload} lpk={lpk}
+Xpb p1 out_peaked ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} cload={cload} lpk={lpk}
+
+* Path B: same two stages without useful peaking inductance.
+Xna in n1 ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} cload={cload} lpk={tiny_l}
+Xnb n1 out_nopeak ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} cload={cload} lpk={tiny_l}
+
+.subckt ctle_stage in out params: gm=0.04 re=60 ce=30f rload=200 cload=10f lpk=60p
+Gcore out em value={gm*V(in,em)}
+Re em 0 {re}
+Ce em 0 {ce}
+Lload out load {lpk}
+Rload load 0 {rload}
+Cload out 0 {cload}
+.ends ctle_stage
+
+.ac dec 300 100meg 150gig
+
+.control
+run
+wrdata ctle_ac.csv frequency vdb(out_peaked) vdb(out_nopeak) vp(out_peaked) vp(out_nopeak)
+quit
+.endc
+.end

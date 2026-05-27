@@ -1,0 +1,32 @@
+* VCH/VCL balance-loop principle macro model
+* This model abstracts the balance loop in Fig. 19.9.2/19.9.3.
+* If VCH>VCL, the loop increases Branch-P load current and decreases Branch-N load
+* current, so VCH falls and VCL rises until both voltages are equal.
+
+.options reltol=1e-6 abstol=1e-12 vntol=1e-8
+.param cstore=47u
+.param ibase=80m
+.param kbal=3m
+
+CCH vch 0 {cstore} IC=36
+CCL vcl 0 {cstore} IC=24
+* Rectifier replenishment, represented as equal average charging currents.
+ICHG_H 0 vch DC {ibase}
+ICHG_L 0 vcl DC {ibase}
+* Branch extraction currents controlled by voltage mismatch.
+BLOAD_H vch 0 I={ibase + kbal*(V(vch)-V(vcl))}
+BLOAD_L vcl 0 I={ibase - kbal*(V(vch)-V(vcl))}
+BERR err 0 V={V(vch)-V(vcl)}
+
+.tran 20u 40m 0 20u uic
+.control
+run
+meas tran initial_err FIND v(err) AT=0.1m
+meas tran final_err FIND v(err) AT=40m
+meas tran final_vch FIND v(vch) AT=40m
+meas tran final_vcl FIND v(vcl) AT=40m
+print initial_err final_err final_vch final_vcl
+wrdata isdb_balance_loop.csv time v(vch) v(vcl) v(err)
+quit
+.endc
+.end

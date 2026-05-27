@@ -1,0 +1,22 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * simplified switched isdb dc-dc power-stage model
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 72035
+avg_vout            =  1.20016e+01 from=  1.50000e-03 to=  2.00000e-03
+pp_vout             =  1.40724e-03 from=  1.50000e-03 to=  2.00000e-03
+avg_il1             =  9.00129e-02 from=  1.50000e-03 to=  2.00000e-03
+avg_il2             =  9.00113e-02 from=  1.50000e-03 to=  2.00000e-03
+avg_vout = 1.200161e+01
+pp_vout = 1.407239e-03
+avg_il1 = 9.001290e-02
+avg_il2 = 9.001132e-02
+ngspice-46 done

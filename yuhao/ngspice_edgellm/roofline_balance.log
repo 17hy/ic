@@ -1,0 +1,23 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * edgellm roofline / hbm balance behavioral model
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 1011
+ffn_demand_bits     =  1.63840e+04
+mha_demand_bits     =  1.63840e+04
+hbm_service_bits    =  1.63840e+04
+ddr_service_bits    =  4.09600e+03
+ffn_ratio_val       =  1.00000e+00
+mha_ratio_val       =  1.00000e+00
+hbm_util_percent    =  7.59740e+01
+edge_backlog_end    =  1.81899e-15
+ddr_backlog_end     =  1.22880e+01
+ngspice-46 done

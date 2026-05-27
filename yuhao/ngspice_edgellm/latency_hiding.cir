@@ -1,0 +1,21 @@
+* EdgeLLM instruction pipeline latency-hiding behavioral model
+* Voltages are latency in microseconds and saved percentage.
+
+.param steps=17
+.param compute_us=38.5
+.param host_update_us=8
+
+Bnohide no_hiding_total_us 0 V={steps*(compute_us+host_update_us)}
+Bhide hiding_total_us 0 V={compute_us+host_update_us+(steps-1)*compute_us}
+Bsave saved_percent 0 V={(1-(compute_us+host_update_us+(steps-1)*compute_us)/(steps*(compute_us+host_update_us)))*100}
+Bfirst first_step_us 0 V={compute_us+host_update_us}
+Bsteady steady_step_us 0 V={compute_us}
+
+.op
+.control
+run
+print v(no_hiding_total_us) v(hiding_total_us) v(saved_percent) v(first_step_us) v(steady_step_us)
+wrdata latency_hiding_op.csv v(no_hiding_total_us) v(hiding_total_us) v(saved_percent) v(first_step_us) v(steady_step_us)
+quit
+.endc
+.end

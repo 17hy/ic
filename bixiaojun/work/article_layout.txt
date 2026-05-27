@@ -1,0 +1,159 @@
+                                                                                                                                               ISSCC 2026 / SESSION 23 / NEXT-GENERATION OPTICAL TRANSCEIVERS / 23.3
+
+                                                                                                                   23.3                                    A 2×500Gb/s Monolithic Silicon-Photonic DWDM PAM-4 Transceiver in 45nm CMOS SOI
+                                                                                                                                                           Ziang Xu*, Yalong Lin*, Jinxuan Jin*, Zhenkai Ye*, Dacheng Xu, Aolin Xu, Chaodi Sheng, Binwen Hong, Xiaojun Bi
+                                                                                                                                                           Huazhong University of Science and Technology, Wuhan, China
+                                                                                                                                                           *Equally Credited Authors (ECAs)
+
+                                                                                                                                                                                                                                           Abstract
+                                                                                                                             This work presents a monolithic 2×5λ DWDM microring transceiver in 45nm CMOS SOI                                     locking circuit. V-groove and a PSR-to-CRR front end enable low coupling loss and tight
+                                                                                                                             delivering 2×500Gb/s (100Gb/s PAM-4/channel). The transceiver features a low-noise TIA                               λ-spacing. Through electro-photonic co-design, the transceiver achieves an efﬁciency
+                                                                                                                             with Q-tamed CTLE, a high-speed MRM driver, and a PWM-based IL-adjustable wavelength-                                <2.5pJ/b at 100Gb/s per channel in end-to-end loopback.
+
+                                                                                                                                                The rapid growth of AI and machine learning (ML) is driving unprecedented bandwidth               Figure 23.3.3 shows the architecture of the MRM driver, consisting of a three-stage
+                                                                                                                                                demands in hyperscale datacenters [1], necessitating short-reach, high-density optical            preampliﬁer, a level shifter, and a main driver. The preampliﬁer converts single-ended
+                                                                                                                                                interconnects with improved energy efﬁciency. Silicon photonics offers a scalable solution        MSB/LSB inputs into differential signals, provides equalization and gain, and employs shunt
+                                                                                                                                                through monolithic integration of photonic and electronic devices, which eliminates pad           peaking and negative capacitance to achieve a bandwidth of >30GHz. The level shifter
+                                                                                                                                                and wire-bonding parasitics and enables direct ﬁber-to-chip coupling. Prior monolithic            generates full-swing outputs in two voltage domains (0–VDDL and VDDL–VDDH) using
+                                                                                                                                                microring transceivers have demonstrated the potential of this approach [2-5], though             stacked inverters for high swing capability. The main driver then combines the two NRZ
+                                                                                                                                                channel data rates remain limited to 64Gb/s NRZ [1-2] and 40Gb/s PAM-4 [3], which are             signals into PAM-4. A series-peaking inductor with a tunable parallel resistor forms an R+L
+                                                                                                                                                insufﬁcient for 800G and future 1.6T modules [6]. While PAM-4 microring transceivers [3],         CTLE, which reduces swing to 2.5Vppd while extending output bandwidth. An on-chip bias-
+                                                                                                                                                [7], [8] improve bandwidth density and energy efﬁciency, several challenges persist:              T provides DC biasing and enables direct connection to the MRM anode and cathode.
+2026 IEEE International Solid-State Circuits Conference (ISSCC) | 979-8-3315-8936-3/26/$31.00 ©2026 IEEE | DOI: 10.1109/ISSCC49663.2026.11409086
+
+
+
+
+                                                                                                                                                    1) The microring modulator (MRM) needs to balance bandwidth, linearity, and optical           The architecture concept diagram of the WLL circuit is shown in Fig. 23.3.4. At the front
+                                                                                                                                                       modulation amplitude (OMA) when operating at different insertion loss (IL) points, to      end, an MPD current (Iph) ampliﬁer is designed, which is automatically adjusted by a 6b
+                                                                                                                                                       address dynamic application requirements [9-11].                                           digital signal to regulate the Iph gain, eliminating mismatches between channels in the WDM
+                                                                                                                                                                                                                                                  system and handling variations in incoming optical power and system optical path losses.
+                                                                                                                                                    2) With denser wavelength division multiplexing (WDM) requiring narrower wavelength           This ensures the best matching of Iph with the circuit’s dynamic input range. A 1-bit bang-
+                                                                                                                                                       spacing, sharp microring resonator (MRR) ﬁlters can effectively reduce crosstalk but       bang ADC is used for A/D conversion, thereby reducing hardware overhead compared to a
+                                                                                                                                                       at the expense of limiting the demultiplexed bandwidth.                                    traditional SAR ADC. The locking with adjustable IL scheme is implemented as follows: the
+                                                                                                                                                                                                                                                  circuit ﬁrst adjusts the gain of the Iph ampliﬁer in a SWEEP & ADJUST mode to match the
+                                                                                                                                                    3) Thermal drift of MRR resonance requires active stabilization and monitor photodiode        peak values of Iph and IL reference DAC, the latter of which is initialized to Vmax.
+                                                                                                                                                       (MPD) current mismatches exist between channels in multiple channel wavelength             Subsequently, by changing the DAC input code to VIL via the on-chip SPI interface, where
+                                                                                                                                                       locking (WLL) situations.                                                                  Desired IL = 1-(VIL/Vmax), the circuit achieves wavelength locking precisely to the target IL
+                                                                                                                                                                                                                                                  point by tuning the microring so that the resulting voltage of Iph matches VIL. This scheme
+                                                                                                                                                    4) A fundamental trade-off exists among power consumption, compensation capability,           is compatible with WLL applications for both TX MRM and RX CRR and addresses the
+                                                                                                                                                       and frequency response in the continuous-time linear equalizer (CTLE) required in the      bandwidth, linearity, and OMA trade-offs presented by MRM at different IL points to meet
+                                                                                                                                                       transceiver link.                                                                          dynamic application requirements. The effective number of bits of the thermal control DAC
+                                                                                                                                                                                                                                                  is extended to 14b by PWM, which further reduces system area and complexity, with a size
+                                                                                                                                               These limitations motivate the need for advanced co-design techniques to further enhance           advantage compared to the previously used delta-sigma modulation module. The output
+                                                                                                                                               performance.                                                                                       driver stage achieves thermal-tuning current exceeding 15mA.
+
+                                                                                                                                               As seen in Fig. 23.3.1, this work presents a monolithic 2×500Gb/s dense wavelength division        Figure 23.3.5 shows eye diagrams for the 50GBaud PAM-4 TX and 56GBaud PAM-4 RX.
+                                                                                                                                               multiplexing (DWDM) microring transceiver in 45nm CMOS SOI. A co-designed electro-                 The TX achieves a 4.82dB extinction ratio and an RLM of 0.99 at 100Gb/s PAM-4 under a
+                                                                                                                                               photonic architecture implements a 2×5λ transceiver supporting 100Gb/s PAM-4 per                   −6.2dB IL operating point, with MSB/LSB skew applied. The ﬁgure also plots BER versus
+                                                                                                                                               channel. V-groove couplers are employed to achieve lower ﬁber-to-chip coupling loss [12].          received optical power for the ﬁve RX channels at 112Gb/s PAM-4, demonstrating a
+                                                                                                                                               In the TX, microrings with a radius of 7.5μm and a pre-alignment of 0.054μm exhibit a free         sensitivity of −5.3dBm at the BER limit of 2.4e-4. The end-to-end TRX attains an energy
+                                                                                                                                               spectral range (FSR) of 9.267nm and a channel spacing of 1.853nm (≈ 324GHz). At the RX             efﬁciency below 2.5pJ/b. The test results for WLL are also illustrated in Fig. 23.3.5, showing
+                                                                                                                                               input, V-groove couplers, on-chip polarization splitter rotator (PSR), coupled-ring resonator      the SWEEP & ADJUST mode clearly after system reset, followed by locking and bang-bang
+                                                                                                                                               (CRR) ﬁlters and dual-detector PD are deployed to enhance crosstalk suppression and                thermal tuning processes. By conﬁguring different IL points, the microring resonance can
+                                                                                                                                               enable tighter channel spacing, while the increased RX bandwidth helps maintain signal             be locked to various IL values, successfully validating operation at 6dB, 3dB, 1.5dB, and
+                                                                                                                                               integrity. Furthermore, each channel integrates an on-chip WLL circuit, ensuring both MRMs         near the resonance peak. Thermal stabilization was veriﬁed under an environmental thermal
+                                                                                                                                               and CRRs operate at their optimal wavelength points without requiring extra off-chip control       disturbance of approximately 40°C. The measured thermal tuning efﬁciency is 0.3nm/mW
+                                                                                                                                               logic.                                                                                             for TX MRM, and is 0.42nm/mW for CRR, with corresponding tuning ranges are 5.5nm and
+                                                                                                                                                                                                                                                  over 7nm, respectively. The total power consumption of the entire WLL circuit is 26.7mW,
+                                                                                                                                                   Figure 23.3.2 depicts the implemented transimpedance ampliﬁer (TIA), which employs a           with the control part consuming only 7.9mW.
+                                                                                                                                                   low-noise bandwidth-enhanced architecture for 112Gb/s PAM-4 operation. The
+                                                                                                                                                   transimpedance stage (TIS) utilizes a large feedback resistor to achieve high front-end gain   Figure 23.3.6 shows the performance comparison between this work and previously
+                                                                                                                                                   and low input-referred noise, which intensiﬁes the design constraints for subsequent           reported MRM TRXs. Compared with other monolithic integrations, this work achieves the
+                                                                                                                                                   equalization. Conventional CTLE solutions face critical limitations: source-degenerated        highest single-channel data rate of 100Gb/s and an energy efﬁciency of <2.5pJ/b under
+                                                                                                                                                   topologies sacriﬁce gain for peaking generation with poor scalability beyond 30GHz, while      PAM-4 modulation. It also demonstrates leading performance in terms of bandwidth density
+                                                                                                                                                   inductive peaking techniques suffer from peaking amplitude versus response shape trade-        and total bandwidth per ﬁber.
+                                                                                                                                                   offs – high peaking amplitude reduces peaking frequency and elevates Q-factor, degrading
+                                                                                                                                                   time-domain performance. To overcome these challenges, a cascaded Q-tamed CTLE is              Figure 23.3.7 shows the monolithic 2×500 Gb/s microring transceiver, fabricated in 45nm
+                                                                                                                                                   introduced. The CTLE adopts a 2-stage Gm-ZT topology with series inductive peaking             CMOS SOI, integrating ten-channel drivers and TIAs, optical components, and V-groove
+                                                                                                                                                   (CTLE1 + CTLE2), while a Q-tamed path (QTP) is designed for frequency response shaping.        couplers. The area of a single TX channel is 400μm × 550μm, and that of a single RX channel
+                                                                                                                                                   The QTP is implemented through a hybrid passive low-Q inductor and Gm-based active             is 400μm × 535μm. In the TX/RX, the area of a single WLL is 0.063/0.15mm², respectively,
+                                                                                                                                                   inductor between stages. As shown in Fig. 23.3.2, the QTP splits the resonance peaks of        and the overall energy efﬁciency of TX/RX is 1.82pJ/b and 0.6pJ/b, respectively.
+                                                                                                                                                   CTLE1 and CTLE2 (originally coincident at 41GHz), boosts mid-band gain (10~30GHz), and
+                                                                                                                                                   suppresses the overall Q-factor. The Q-tamed CTLE achieves 6.1dB baseline gain with            Acknowledgement:
+                                                                                                                                                   12.4dB peaking at 41GHz. Under the same output voltage swing, a 60% improvement in             The authors would like to thank M.M. Zhang, S. Zheng, Z.Y. Zhou, and Z.H. Sun from
+                                                                                                                                                   eye height and a 30% improvement in eye width were achieved by time-domain simulation.         Huazhong University of Science and Technology for their assistance with the design and
+                                                                                                                                                   The output buffer after the CTLE leverages inverter-based architecture for 50Ω matching.       deployment of the optical components. This work was supported in part by the National
+                                                                                                                                                   The TIA achieves 62dBΩ gain, 43.5GHz bandwidth, and 3.14μArms input-referred noise while       Key Research and Development Program of China under Grant 2022YFB2802600, and in
+                                                                                                                                                   consuming 67mW, validating the design as a breakthrough solution reconciling high-             part by the National Natural Science Foundation of China under Grant 62571210.
+                                                                                                                                                   frequency peaking, low-Q response, and power efﬁciency in >100G receiver front ends.           Corresponding author: Xiaojun BI
+
+                                                                                                                                                                      Authorized licensed use limited to: Hohai University Library. Downloaded on April 09,2026 at 12:32:03 UTC from IEEE Xplore. Restrictions apply.
+                                                                                                                                                   400 • 2026 IEEE International Solid-State Circuits Conference                                                                      979-8-3315-8936-3/26/$31.00 ©2026 IEEE
+                                                                                                                     ISSCC 2026 / February 17, 2026 / 4:25 PM
+References:
+[1] R. Nagarajan, I. Lyubomirsky, and O. Agazzi, “Low power DSP-based transceivers for
+data center optical ﬁber communications (invited tutorial),” Journal of Lightwave
+Technology, vol. 39, no. 16, pp. 5221–5231, Aug. 2021.
+https://doi.org/10.1109/JLT.2021.3089901
+[2] N. Qi et al., “A monolithically integrated DWDM si-photonics transceiver for chiplet
+optical I/O,” IEEE Journal of Solid-State Circuits, pp. 1–13, 2025.
+https://doi.org/10.1109/JSSC.2025.3585584
+[3] A. Sadr and A. Chan Carusone, “A monolithic microring modulator-based transmitter
+with a multiobjective thermal controller,” IEEE Open Journal of the Solid-State Circuits
+Society, vol. 4, pp. 340–350, 2024. https://doi.org/10.1109/OJSSCS.2024.3507754
+[4] K. Omirzakhov, H. Hao, A. Pirmoradi, and F. Aﬂatouni, “Energy efﬁcient monolithically
+integrated 256 gb/s optical transmitter with autonomous wavelength stabilization in 45
+nm CMOS SOI,” IEEE Journal of Solid-State Circuits, pp. 1–10, 2024.
+https://doi.org/10.1109/JSSC.2024.3511673
+[5] K. Omirzakhov and F. Aﬂatouni, “Monolithically integrated sub-63 fJ/b 8-channel
+256Gb/s optical transmitter with autonomous wavelength locking in 45nm CMOS SOI,”
+in 2024 IEEE International Solid-State Circuits Conference (ISSCC), Feb. 2024, pp. 218–
+220. https://doi.org/10.1109/ISSCC49657.2024.10454519
+[6] P. Dong et al., “Silicon photonics for 800G and beyond: [invited],” in 2022 Optical
+Fiber Communications Conference and Exhibition (OFC), Mar. 2022, pp. 01–03. Accessed:
+Jul. 31, 2025. [Online]. https://doi.org/10.1364/OFC.2022.M4H.1
+[7] S. Ma et al., “A 4λ×128Gb/s PAM-4 si-photonic transmitter with micro-ring modulator
+and co-designed linear driver for chiplet optical I/O,” in Optical Fiber Communication
+Conference (OFC) 2025 (2025), paper M2H.2, Optica Publishing Group, Mar. 2025, p.
+M2H.2. https://doi.org/10.1364/OFC.2025.M2H.2
+[8] H. Li et al., “A 3D-Integrated Microring-Based 112Gb/s PAM-4 Silicon-Photonic
+Transmitter with Integrated Nonlinear Equalization and Thermal Control,” in 2020 IEEE
+International Solid-State Circuits Conference - (ISSCC), Feb. 2020, pp. 208–210.
+https://doi.org/10.1109/ISSCC19947.2020.9063122
+[9] H. Li et al., “A 112 gb/s PAM4 silicon photonics transmitter with microring modulator
+and CMOS driver,” Journal of Lightwave Technology, vol. 38, no. 1, pp. 131–138, Jan.
+2020. https://doi.org/10.1109/JLT.2019.2938731
+[10] S. Agarwal, M. Ingels, M. Pantouvaki, M. Steyaert, P. Absil, and J. Van Campenhout,
+“Wavelength locking of a si ring modulator using an integrated drop-port OMA monitoring
+circuit,” IEEE Journal of Solid-State Circuits, vol. 51, no. 10, pp. 2328–2344, Oct. 2016.
+https://doi.org/10.1109/JSSC.2016.2592691
+[11] C. S. Levy et al., “8-λ × 50 gbps/λ heterogeneously integrated si-ph DWDM
+transmitter,” IEEE Journal of Solid-State Circuits, vol. 59, no. 3, pp. 690–701, Mar. 2024.
+https://doi.org/10.1109/JSSC.2023.3344072
+[12] W. Kocon, Y. Bian, K. Giewont, and T. Letavic, “Key technologies and performance
+aspects for electrical and optical interconnects,” in 2025 Symposium on VLSI Technology
+and Circuits (VLSI Technology and Circuits), Jun. 2025, pp. 1–3.
+doi: 10.23919/VLSITechnologyandCir65189.2025.11075044.
+https://doi.org/10.23919/VLSITechnologyandCir65189.2025.11075044
+[13] Z. Xuan et al., “A 256 gbps heterogeneously integrated silicon photonic microring-
+based DWDM receiver suitable for in-package optical I/O,” in 2023 IEEE Symposium on                                                                                    23
+VLSI Technology and Circuits (VLSI Technology and Circuits), Kyoto, Japan: IEEE, June
+2023, pp. 1–2.
+
+
+
+
+Figure 23.3.1: Block diagram of the 2×5-channel monolithic microring-based DWDM
+transceiver.                                                                    Figure 23.3.2: Architecture of cascaded Q-tamed CTLE-based TIA.
+                    Authorized licensed use limited to: Hohai University Library. Downloaded on April 09,2026 at 12:32:03 UTC from IEEE Xplore. Restrictions apply.
+                                                                                                                                    DIGEST OF TECHNICAL PAPERS • 401
+ISSCC 2026 / SESSION 23 / NEXT-GENERATION OPTICAL TRANSCEIVERS / 23.3
+
+
+
+
+Figure 23.3.3: Architecture of the MRM driver.                                          Figure 23.3.4: Schematic and concept of the wavelength-tuning circuit.
+
+
+
+
+Figure 23.3.5: Measurement results.                                                     Figure 23.3.6: Performance summary and comparison.
+
+
+
+
+Figure 23.3.7: Micrograph of the chip and the TRX power breakdown.
+                Authorized licensed use limited to: Hohai University Library. Downloaded on April 09,2026 at 12:32:03 UTC from IEEE Xplore. Restrictions apply.
+    • 2026 IEEE International Solid-State Circuits Conference                                                               979-8-3315-8936-3/26/$31.00 ©2026 IEEE
+

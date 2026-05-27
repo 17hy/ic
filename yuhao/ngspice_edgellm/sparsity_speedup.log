@@ -1,0 +1,21 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * edgellm log-scale structured sparsity behavioral model
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+No. of Data Rows : 1
+v(dense_effective_bitwidth) = 4.125000e+00
+v(sparse50_effective_bitwidth) = 3.125000e+00
+v(sparse75_effective_bitwidth) = 1.875000e+00
+v(sparse875_onehot_effective_bitwidth) = 1.625000e+00
+v(sparse875_effective_bitwidth) = 1.125000e+00
+v(speedup_50pct) = 1.320000e+00
+v(speedup_75pct) = 2.200000e+00
+v(speedup_875pct_onehot) = 2.538462e+00
+v(speedup_875pct_addr) = 3.666667e+00
+ngspice-46 done

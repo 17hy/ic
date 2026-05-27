@@ -1,0 +1,38 @@
+* WLL IL-adjustable wavelength-locking macro model
+* Based on Fig. 23.3.4. It abstracts MPD gain adjustment, 1-bit bang-bang ADC,
+* PWM thermal DAC, heater/thermal plant, and a monotonic side-of-resonance optical slope.
+
+.options method=gear reltol=1e-6 abstol=1e-12 vntol=1e-8
+.param vtarget=0.55
+.param mpd_scale=0.62
+.param gain_final={1/mpd_scale}
+.param klock=10
+.param eps=0.01
+.param tau=1m
+
+VTARGET target 0 {vtarget}
+* Environmental thermal disturbance shifts the ring slope at 7 ms.
+VDIST env 0 PWL(0 0 6.9m 0 7m 0.22 14m 0.22)
+VLOCKEN locken 0 PWL(0 0 1.9m 0 2.1m 1 14m 1)
+VGAIN gain 0 PWL(0 1 2m {gain_final} 14m {gain_final})
+
+* Detuning state: sweep during start-up, then bang-bang tracking.
+CDET det 0 {tau}
+RLEAK det 0 1e9
+BCTRL 0 det I={ (1-V(locken))*1.1 + V(locken)*klock*tanh((V(target)-V(vph))/eps) }
+
+* Monotonic selected-side optical response; after gain correction, peak maps near Vmax=1.
+BPH vph 0 V={ V(gain)*mpd_scale/(1+exp(-5*(V(det)-V(env)))) }
+BERR err 0 V={V(vph)-V(target)}
+
+.tran 5u 14m 0 5u uic
+.control
+run
+meas tran lock_err_pre FIND v(err) AT=6m
+meas tran lock_err_post FIND v(err) AT=13.8m
+meas tran gain_after FIND v(gain) AT=2.1m
+print lock_err_pre lock_err_post gain_after
+wrdata wll_locking_transient.csv time v(det) v(env) v(vph) v(target) v(gain) v(err)
+quit
+.endc
+.end

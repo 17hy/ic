@@ -1,0 +1,794 @@
+3352                                                   IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+
+             EdgeLLM: A Highly Efficient CPU-FPGA
+               Heterogeneous Edge Accelerator for
+                     Large Language Models
+                  Mingqiang Huang , Ao Shen , Kai Li , Haoxiang Peng , Boyu Li , Yupeng Su ,
+                                      and Hao Yu , Senior Member, IEEE
+
+   Abstract— The rapid advancements in artificial intelligence                  which mainly attributable to GPU; Second is the evolution of
+(AI), particularly the Large Language Models (LLMs), have pro-                  AI algorithm [4], [5], [6], especially the convolutional neural
+foundly affected our daily work and communication forms. How-                   networks for computer vision (CV), and the recurrent neural
+ever, it is still a challenge to deploy LLMs on resource-constrained
+edge devices (such as robots), due to the intensive computation                 networks for natural language processing (NLP); Third is the
+requirements, heavy memory access, diverse operator types and                   AI big data [7], [8], which serves as the foundational support
+difficulties in compilation. In this work, we proposed EdgeLLM                  for the training of AI models, fueling their precision and
+to address the above issues. Firstly, focusing on the computation,              efficacy. These factors have coalesced to drive a transformative
+we designed mix-precision processing element array together                     era in AI.
+with group systolic architecture, that can efficiently support
+both FP16∗FP16 for the MHA block (Multi-Head Attention)                            Since 2017, Transformer algorithm has rapidly become a
+and FP16∗INT4 for the FFN layer (Feed-Forward Network).                         dominant force in the field of artificial intelligence in terms of
+Meanwhile specific optimization on log-scale structured weight                  both NLP and CV research field [4], [5], [6]. By introducing
+sparsity, has been used to further increase the efficiency.                     the self-attention mechanism, Transformer altered traditional
+Secondly, to address the compilation and deployment issue,                      sequence modeling methods, no longer relying on convolu-
+we analyzed the whole operators within LLM models and
+developed a universal data parallelism scheme, by which all of the              tional neural networks (CNNs) or recurrent neural networks
+input and output features maintain the same data shape, enabling                (RNNs) for feature extraction and sequence handling. This
+to process different operators without any data rearrangement.                  innovation not only enhanced the parallelization capabilities
+Then we proposed an end-to-end compiler to map the whole                        of models, making the training of large-scale models possible,
+LLM model on CPU-FPGA heterogeneous system (AMD Xilinx                          but also significantly improved model performance.
+VCU128 FPGA). The accelerator achieves 1.91× higher through-
+put and 7.55× higher energy efficiency than the commercial GPU                     Following the success of Transformer, researchers began to
+(NVIDIA A100-SXM4-80G). When compared with state-of-the-                        explore even larger models, which typically have billions or
+art FPGA accelerator of FlightLLM, it shows 10-24% better                       more parameters, known as ‘large language models’ [9], [10],
+performance in terms of HBM bandwidth utilization, energy                       [11]. For example, the GPT (Generative Pre-trained Trans-
+efficiency and LLM throughput.
+                                                                                former) series of models from OpenAI, has showcased ability
+  Index Terms— Large language model, AI accelerator.                            to understand and generate high-quality human language [11].
+                                                                                Nowadays, the large language models have begun integrating
+                       I. I NTRODUCTION                                         with other modalities such as vision and audio, showing
+
+A     RTIFICIAL Intelligence has captured keen interest and
+      worldwide attention in the past ten years [1], [2], [3], [4],
+[5]. This is mainly associated with three pivotal advancements:
+                                                                                capable of outstanding performance in cross-domain task.
+                                                                                This interactive capability makes AI assistants, chatbots, and
+                                                                                virtual agents more human-like and efficient [12], [13], [14],
+First is the exponential escalation in computational prowess,                   [15]. In summary, large language models not only enhance
+                                                                                AI’s language processing capabilities but also advance broader
+  Received 31 July 2024; revised 20 November 2024, 26 January 2025,
+and 19 February 2025; accepted 24 February 2025. Date of publication
+                                                                                technological progress in AI, bringing revolutionary changes
+6 March 2025; date of current version 1 July 2025. This work was                to industries such as education, entertainment, healthcare, and
+supported in part by the Scientific and Technological Innovation (STI)          business.
+2030-Major Projects under Grant 2022ZD0210600, in part by the National
+Natural Science Foundation of China (NSFC) under Grant 92464102 and
+                                                                                   Nonetheless, the prevailing trend in contemporary AI
+Grant 62034007, in part by the Natural Science Foundation of Guangdong          accelerator architectures, especially those geared towards the
+Province under Grant 2023B1515020051, in part by Shenzhen Science and           demands of large language models, predominantly relies on
+Technology Program under Grant JCYJ20200109115210307, and in part by
+the Science and Technology Innovation Key Research and Development
+                                                                                the GPU paradigm. This conventional design, while powerful,
+Program of Chongqing. This article was recommended by Associate Editor          exhibits inherent limitations that render it less than ideal for
+X. Zeng. (Mingqiang Huang and Ao Shen contributed equally to this work.)        deployment on edge devices. The constraints imposed by
+(Corresponding author: Hao Yu.)
+  Mingqiang Huang is with Shenzhen Institute of Advanced Technology,
+                                                                                the GPU architecture, such as high power consumption and
+Chinese Academy of Sciences, Shenzhen 518055, China.                            extensive computational overhead, pose significant challenges
+  Ao Shen, Kai Li, Haoxiang Peng, Boyu Li, Yupeng Su, and Hao Yu are            to the practicality and efficiency of implementing AI capabil-
+with the School of Microelectronics, Southern University of Science and
+Technology, Shenzhen 518055, China (e-mail: yuh3@sustech.edu.cn).
+                                                                                ities at the network’s periphery. Despite its attributes of high
+  Digital Object Identifier 10.1109/TCSI.2025.3546256                           flexibility and high-performance capabilities in specific tasks,
+               1549-8328 © 2025 IEEE. All rights reserved, including rights for text and data mining, and training of artificial intelligence
+                     and similar technologies. Personal use is permitted, but republication/redistribution requires IEEE permission.
+                                     See https://www.ieee.org/publications/rights/index.html for more information.
+        Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                      3353
+
+
+
+FPGA, a crucial component of heterogeneous computing,                          time lags, thereby reducing the overall system efficiency and
+receives scant mention. The FPGA based implementation of                       throughput.
+LLM holds considerable promise for substantially enhancing                        Besides, in large language models, the operator graph,
+computational efficiency and performance [16], [17], [18],                     which defines the computation flow, can be exceedingly com-
+[19], [20]. However, several critical challenges remain to be                  plex with hundreds/thousands of operators interconnected in
+effectively addressed.                                                         intricate ways. Ensuring that the transition from one operator
+   The first challenge within LLM is the heavy computation                     to another is seamless and efficient becomes a significant chal-
+and memory access [21], [22]. Large language models often                      lenge. Traditional compilers are designed to optimize code for
+contain billions of parameters in matrix-matrix multiplication                 sequential execution, but the nature of deep learning models
+(MatMUL) or vector-matrix multiplication (VMM). We often                       requires a different approach. The dataflow graphs of these
+refer to a model as LLM-6B or LLM-7B, where 6B or                              models present opportunities for parallelism and pipelining
+7B denotes the number of weight parameters in the matrix                       that traditional compilers might not fully exploit. Therefore,
+multiplications. The sheer volume of parameters translates into                specialized deep learning compilers and runtime systems have
+extensive memory requirements, making it difficult to fit these                emerged to address these unique requirements. These com-
+models into the memory of standard hardware. To address                        pilers analyze the operator graph to identify opportunities
+such issue, several strategies have been developed, such as                    for optimization, such as operator fusion, which combines
+model pruning and quantization. Existing solutions typically                   adjacent operators into a single, more efficient operation.
+quantize these weight parameters to INT4 format [21]. How-                     Another critical aspect is the management of memory access
+ever, to ensure computational accuracy, the activation functions               patterns. Efficiently handling the movement of data between
+in the model remain in FP16 format. Therefore, the system                      different memory hierarchies can significantly impact perfor-
+requires matrix multiplications using FP16∗INT4 format in the                  mance. In summary, the compilation system for large models
+FFN(Feed-Forward Neural Network) layers. Besides, despite                      must be sophisticated enough to handle the complexity of the
+its theoretical advantages, sparse representation techniques                   operator graph, optimize for parallelism, and manage memory
+have yet to gain widespread traction within the industry [23],                 access efficiently.
+[24]. As such, there exists a clear opportunity of specialized                    In this work, we develop an efficient CPU-FPGA het-
+hardware components tailored to the unique requirements                        erogeneous acceleration system for large language model,
+of both sparse and INT4 quantized models. On the other                         where FPGA executes the core computational operators, and
+hand, in the MHA (Multi-Head Attention) block, KVcache                         CPU executes the dynamic compilation process. When it
+is dynamically generated as activation data, thus the matrix                   comes to operational efficiency, our innovative design proposal
+multiplication involving KVcache requires FP16∗FP16 for-                       outperforms both conventional GPU chips and state-of-the-
+mat. Therefore, it is highly desired to design mix-precision                   art FPGA systems. Such superior performance is achieved
+computation elements for the acceleration of LLMs.                             through a combination of optimized hardware architecture,
+   Another challenge lies in the compilation system, specifi-                  efficient data handling mechanisms, and advanced dynamic
+cally addressing the vast number of operators and optimizing                   compilation scheme.
+the linkage between them, which is crucial for enhancing                          The main contributions are:
+computational speed [25]. Current AI chips grapple with                        1. We analyzed the computational requirements of FFN (Feed-
+the issue of non-uniform data formats for different opera-                         Forward Network) and MHA (Multi-Head Attention), and
+tors, particularly when dealing with deep learning models.                         proposed high efficiency mix-precision computation unit
+These models usually consist of a series of diverse operators:                     together with group systolic architecture. Besides, log-scale
+CNN networks predominantly utilize linear operations such as                       structured-sparsity together with the block-level quantiza-
+Matrix Multiplication, Convolution and Pooling operators [2];                      tion method are proposed to balance the hardware efficiency
+while the Transformer networks heavily rely on complex                             and algorithm accuracy.
+nonlinear operations such as Layer Normalization, Multi-                       2. We analyzed the compilation requirements in LLM and
+Head Attention Mechanisms (MHA), Embedding Lookups                                 devised unified and universal data format for all of the
+and Positional Encoding [4], [5]. Each operator potentially                        operator and all of the high-dimensional tensor structures
+requires distinct data formats to achieve optimal computational                    within AI algorithms, enabling the system to execute the
+efficiency. For instance, convolutional layers might prefer the                    operators swiftly and without any data rearrangement.
+NHWC format (batch size, height, width, channels) or the                       3. We developed end-to-end compilation scheme, in which
+NCHW format (batch size, channels, height, width). While                           dynamic compilation is used for different input token
+in Transformer-like network, the diverse operators will bring                      length, and instruction pipeline strategy is used to reduce
+more complex data format requirements, especially for those                        latency. The scheme can dynamically compile all of
+operators in MHA, which requires different operations for                          the operators and map the whole model on CPU-FPGA
+different Heads. The absence of a standardized data format                         heterogeneous system.
+in LLM means that when data transitions from one operator                      4. Finally, the whole design has been successfully deployed
+to another, it often necessitates format transformations such                      on AMD Xilinx VCU128 FPGA. Our result achieves
+as reshaping and matrix transposition. These additional oper-                      1.91× higher throughput and 7.55× higher energy effi-
+ations not only add to the computational load and consume                          ciency than GPU, and 10∼24% higher performance than
+precious computational resources but also introduce extra                          state-of-the-art FPGA accelerator of FlightLLM.
+
+       Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+3354                                                    IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+
+Fig. 1. (a) Architecture of the Transformer network and challenges in hardware design for Transformer-like accelerator. (b) Proposed CPU-FPGA heterogeneous
+acceleration system for the large language model.
+
+
+
+           II. BACKGROUND AND R ELATED W ORK                                     processing any position within it, thereby theoretically achiev-
+   In this section, we will provide a concise overview about                     ing superior parallel processing capabilities and capturing
+the algorithm of Transformers and Large Language Models,                         long-range dependencies.
+along with the advancements in high-performance LLM chips                           In 2018, the GPT (Generative Pre-trained Transformer)
+and the high efficiency FPGA accelerator.                                        series of models from OpenAI, has showcased the enormous
+                                                                                 potential of language models in generation and understand-
+A. Transformers and LLMs                                                         ing. GPT-3, in particular, is noteworthy with its 175 billion
+   Transformer model was first introduced in 2017 by the                         parameters, demonstrating an ability to understand and gen-
+famous paper of “Attention is All You Need” [4], which                           erate high-quality human language [11]. In 2019, a research
+broke through the limitations of traditional Recurrent Neu-                      team from Google introduced the Text-to-Text Transfer Trans-
+ral Networks (RNNs) and Convolutional Neural Networks                            former (T5), a unifying framework that reformulates virtually
+(CNNs) when dealing with sequential data by adopting the                         all natural language processing (NLP) tasks as text-to-text
+self-attention mechanism. This mechanism allows the model                        transformation problems [26]. Through pre-training and fine-
+to consider information from the entire sequence while                           tuning, T5 demonstrated outstanding performance across a
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                        3355
+
+
+
+spectrum of NLP tasks, further validating the flexibility and
+robust adaptability of the Transformer architecture [27].
+   As research progressed, the Transformer architecture began
+to be applied to multi-modal tasks, such as image captioning
+and video understanding, achieving effective integration of
+cross-modal information. The famous models include GPT
+Series [11], ChatGLM [28], PaLM [29], Sora [30] and so on.
+These large models demonstrate remarkable abilities in their
+respective fields, ranging from simple text generation to com-
+plex multi-modal understanding and generation, continuously
+pushing the boundaries of artificial intelligence technology.
+
+B. AI Chips for Transformers and LLMs
+   AI chips that support the operation of large language models
+typically require high computational power, high memory
+bandwidth, and an efficient parallel processing architecture.
+So far, most of current AI accelerator systems, particu-
+larly those for large language models, are exclusively based                   Fig. 2. Overall architecture of the accelerator proposed in this work, in which
+on CPU-GPU architecture, such as NVIDIA’s A100 GPU,                            “feat.” and “kv cache” represent the on-line generated activation data (FP16),
+                                                                               “wt.” represents the pre-trained weight parameters (INT4).
+Google’s TPU [31], [32], Intel’s Habana Gaudi AI training
+processor, Graphcore’s Intelligent Processing Unit (IPU), and
+AMD’s Instinct MI200 series GPU. These AI chips usually                        based LLM acceleration system. However, the bandwidth
+provide abundant computational resources (>100 TOP/s), high                    utilization is 65.9%, indicating a relative long pipeline bubbles
+memory bandwidth (>1 TB/s), and high power (>200W)                             between data transmission and computation and can be further
+to support the training and inference of large-scale models.                   improved.
+To catalyze the pervasive integration of AI across societal
+                                                                                                      III. H ARDWARE D ESIGN
+and industrial landscapes, a critical imperative emerges: the
+necessity for AI’s seamless deployment on a diverse spectrum                     In this section, we overview the basic architecture of our
+of edge-side hardware, transcending the confines of cloud-                     accelerator and discuss the mix-precision computation unit
+based accessibility. FPGA implementation offers flexibility in                 together with the sparse strategies.
+design, allowing for customization and optimization of the
+model for specific applications, thus is particularly suitable                 A. Overall Architecture
+for the edge application. Currently, there have been several                      Fig. 2 provides the basic architectural diagram of the
+advances in such fields.                                                       proposed CPU-FPGA Heterogeneous accelerator. The whole
+   The work of [33] maps a 172 GFLOP Neural Machine                            system contains four elements: the Central Processing Unit
+Translation model with mixed-precision representation to a                     (CPU), High Bandwidth Memory (HBM), DDR memory
+single FPGA board, which is the first work on implemen-                        and the LLM Accelerator. The CPU acts as the brain of
+tation a real-life end-to-end NMT model to FPGA. But this                      the system, interfacing with the remaining components via
+work is operated on low frequency of 100MHz and shows                          the Peripheral Component Interconnect Express (PCIe) bus.
+relative low throughput. [34] proposes the ViA, a novel vision                 It wields direct access privileges over DDR and HBM through
+Transformer accelerator architecture based on FPGA, to exe-                    the AXI-full protocol, enabling both read and write operations.
+cute the transformer application efficiently. They obtained                    Furthermore, it leverages the AXI lite protocol to interact with
+nearly 309.6 GOP/s computing performance in the peek                           the accelerator IP’s internal register array, thereby exercising
+on FP16 data type. [20] propose an integer-only acceler-                       control over the accelerator’s operational dynamics.
+ator for Transformer, and the average throughput reaches                          Within the accelerator IP, various LLM operators have
+as high as 762.7 GOPs, demonstrating significant accelera-                     been meticulously incorporated, including MatMUL operator,
+tion performance improvement when compared with previous                       MHA operator, LayerNorm operator and so on. Among these,
+state-of-the-art accelerators. But the integer model is not                    MatMUL and MHA operators are connected with HBM (red
+suitable for the large language model.                                         regions in Fig. 2) due to the extremely high speed memory
+   FlightLLM [16] is the first FPGA based high performance                     access requirements for weight parameters and KVcaches.
+LLM accelerator. By introducing configurable sparse digital                    When accelerating the MatMUL operators, all of the weight
+signal processor (DSP) chain for various sparsity patterns, and                parameters will be pre-processed and stored in HBM, whereas
+always-on-chip decode scheme with mixed-precision support                      the dynamically generated activation data will be written
+to enhance memory bandwidth utilization, the FlightLLM                         back to DDR. For the KVcache, a special write Direct
+achieves 6.0× higher energy efficiency and 1.8× better cost                    Memory Access (DMA) path is constructed to transfer the
+efficiency than the NVIDIA V100S GPU for Llama2-7B                             online generated KVcache into HBM (red lines in Fig. 2).
+models, with 1.2× higher throughput than the NVIDIA A100                       Therefore the MHA operator can also take full use of the
+GPU during decoding, showing great potential for the FPGA                      high bandwidth memory. The other operators, such as the
+
+       Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+3356                                                    IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+                                                                                 meanwhile the HBM provides 16384 bits/cycle. In such cases,
+                                                                                 the system can neither be limited by the memory bound nor
+                                                                                 by the computation bound.
+
+                                                                                 B. Design of Mix-Precision Computing PEs
+                                                                                    Though LLM model contains a large number of operators,
+                                                                                 >95% of the computation operations are still MatMUL or
+                                                                                 VMM. To support the above computation, various systolic
+                                                                                 arrays have been proposed. Google’s TPU [31], [32] is the
+                                                                                 most famous systolic array, which executes the matrix mul-
+                                                                                 tiplication with a fine-grained pipeline. However, it requires
+                                                                                 huge numbers of registers to store the temporary data, leading
+Fig. 3. Roofline model and the designed operation point of this work. Both       to large dynamic power and circuit area. To increase the
+the FFN operator and MHA operator works at the most effective point in our
+design. Note, the “ops” represents only multiplication here.                     efficiency, we have developed the grouped vector systolic
+                                                                                 computing array (G-VSA) [19], which is shown in Fig. 4(a).
+                                                                                 Different from TPU-style or broadcast-style systolic array, the
+LayerNorm, RMSNorm, Rotary embedding, and nonlinear-                             input features and weights in G-VSA are transferred into PE
+activation operators, are connected to the DDR memory                            array in a row-by-row style, thus the power consumption and
+with different custom-designed direct memory access (DMA)                        area can both be largely decreased.
+strategies.                                                                         On the other hand, though the existing LLMs usually
+   All of the operators are specifically designed with cus-                      quantize the weight parameters to INT4 format, the activation
+tomized DMA modules, tasked with fetching activation data                        functions in the model remain in FP16 format to ensure the
+between out-chip DDR and on-chip Block Random Access                             computational accuracy. Therefore, the system requires matrix
+Memory (BRAM). Meanwhile only the MatMUL and MHA                                 multiplications in both FP16∗INT4 format for the FFN-layers
+operators are connected to HBM for the high bandwidth                            and FP16∗FP16 format for the MHA-blocks. Structure of
+weight access. Fig. 3 depicts the roofline model [35] when                       the mix-precision computing PE has been shown in Fig. 4,
+accelerating the matrix multiplication (MatMUL) operator,                        in which Tin = 128 is the vector length. For the FFN layer, the
+serving as a pivotal analytical tool to contrast the boundaries                  module can support Tin = 128 number of FP16 feature data
+of memory-limited and computation-limited domains. The                           ∗ INT4 weight data. While for the MHA block, we set the
+operational intensity, quantified as the ratio of teraflops per                  parallelism to be Tin /4, therefore the module needs Tin /4=32
+byte (TFLOP/Bytes), spans the horizontal axis, whereas the                       number of FP16 activation data, and Tin /4=32 number of FP16
+vertical axis delineates the achievable performance, measured                    KVcache data per clock cycle. Since both the INT4 weight
+in teraflops per second (TFLOP/s). The roofline model adeptly                    data and FP16 KVcache come from the HBM, the comput-
+demarcates the shift from memory-bound to compute-bound                          ing PE requires exactly the same bandwidth in the above
+scenarios. This visual juxtaposition offers profound insights                    two cases. Furthermore, we utilized time-division-multiplexing
+into how varying clocking strategies influence the operational                   method and share DSPs during each FP16∗INT4 computation.
+intensity and attainable performance of MatMUL, thereby                          By such design, the system can be neither limited by the
+elucidating the intricate interplay between memory bandwidth                     memory bound nor the computation bound. Finally, to align
+and computational throughput.                                                    with the computational requirements of the block-level INT4
+   To harness the high-speed communication capability of                         quantization algorithm, the unit also supports the multiplicator
+HBM, we have engineered a computation array that aligns                          of Scale value (in FP16 data format) to adjust the final output.
+impeccably with the roofline model. In the specific task of                         The detailed dataflow in the computation unit has been
+LLM operating with a KVcache framework, the MatMUL task                          described in Fig. 4(b). The whole computation can be divided
+can be simplified into vector-matrix multiplication (VMM).                       into four steps. Stage-0 is to process all of the inputs. Gener-
+Here, the HBM’s bandwidth is 8192 bits per cycle (32 AXI                         ally, the FP16 will be split into sign bit (S), exponent bit (E),
+ports, and each port transmits 256 bits per cycle). To fully                     and mantissa bit (M), while INT4 data will be split into sign
+utilize such high bandwidth, we set the system to consume                        bit (S) and mantissa bit (M). Specially in case of MODE-0,
+a corresponding 8192 bits of weight parameters per cycle,                        each FP16 KVcache data consists of four adjacent INT4 data.
+which means a system computational parallelism of 2048                              In Stage-1, an exclusive-or (XOR) operation is performed
+(under INT4 quantization scheme in FFN). To further increase                     between the sign bits of each FP16 DAT and the INT4 WT.
+the computation intensity, we have doubled the computation                       Concurrently, the exponent bits of FP16 data are analyzed by
+parallelism, thus the HBM-AXI communication module and                           the exponent comparison module, which identifies the highest
+DMA module should be operated at a twice higher frequency                        values among all FP16 inputs. The module computes the
+than that of the computational module. Specifically, we set the                  exponent distance between each input and the maximum one.
+computation parallelism to be 4096 in FP16∗INT4 based FFN                        Meanwhile, the mantissa bits of FP16 and INT4 will be sent to
+layers (FFN weight consumes 4096∗4=16384 bits/cycle), and                        the multiplier array for a multiplication operation. Within the
+the parallelism is 1024 in the FP16∗FP16 based MHA blocks                        multipliers, a deliberate design choice has been to preserve the
+(MHA KVcache consumes 1024∗16==16384 bits/cycle),                                entirety of the mantissa components. This meticulous approach
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                        3357
+
+
+
+
+Fig. 4. (a) Group vector systolic array. (b) Architecture of the fully customized mix-precision vector multiplier for MatMUL operator, which can support
+both FP16∗INT4 computation for FFN layers and FP16∗FP16 computation for MHA layers.
+
+
+
+serves to significantly retain the precision of our computational                   To validate the efficiency of our proposed scheme,
+outcomes, ensuring that no fractional detail is lost in the                      we design two additional sets of control experiments. In these
+arithmetic processes.                                                            experiments, a standard pairwise addition-based adder tree was
+   In Stage-2, the exponent distances and the multiplication                     employed; however, the precision of intermediate calculations
+results obtained in Stage-1 will be fed into the alignment                       varied. In baseline-1 case, we configured the intermediate
+shifter module for aligning the decimal points. Then the                         temporary results to be represented in the FP16 format.
+shifted mantissa results will be sent into the adder tree                        Conversely, in baseline-2 case, a customized FP20 data format
+module for accumulation. Recognizing that the preliminary                        (S1-E6-M13) is used to avoid overflows during computing,
+shifting operations, the input data width will be increased.                     meanwhile maintaining high accuracy due to the large bit
+To avoid excessive resource consumption, we have speci-                          width of mantissa.
+fied the bit-width of the adder tree as 19 bits, resulting                          Performance comparison of the different computing unit
+a balance between resource utilization and computational                         design methods have been listed in Table-I. The pro-
+accuracy.                                                                        posed mix-precision module exhibits significantly higher
+   In Stage-3, the multiplication result and maximum exponent                    efficiency and lower computational errors when compared
+obtained from the previous layers will be converted into spec-                   with the two baseline schemes. Under 100,000 random
+ification FP16 data through LZA (Leading Zero Anticipate)                        input tests, our methodology manifests a mere 0.047%
+module and exponent adjustment module. Then they will be                         error rate on FP16∗INT4 mode, and 0.0044% error rate on
+multiplied with the initial input of Scale value and get the final               FP16∗FP16 mode. While the baseline method incurs large
+result using floating point multiplication. Finally the result will              error rates.
+be input into the integration module to be adjusted to FP16                         Besides, our design exhibits the highest comprehensive
+for output.                                                                      performance in terms of Power, Performance, and Area (PPA).
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+3358                                                   IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+                                TABLE I                                         best. Previous work [36] focused on the linear distribution of
+   P ERFORMANCE C OMPARISON OF THE M IX -P RECISION C OMPUTING                  sparsity (namely 1/8, 2/8, 3/8. . . ), but the hardware utilization
+                U NIT U SING D IFFERENT M ETHODS
+                                                                                is usually low, resulting in low efficiency. The GPU [37] based
+                                                                                fix sparsity (2/4 weight sparsity) shows 2× higher efficiency
+                                                                                in computation, but its memory access overhead has hardly
+                                                                                been reduced. To overcome the above challenges, this paper
+                                                                                resents log-scale structured-sparse (namely 1/2, 1/4, 1/8. . . )
+                                                                                accelerator. With the help of time-unrolled micro-architecture,
+                                                                                the hardware utilization can reach 100% in a wide range of
+                                                                                sparsity, and more importantly, the memory access overhead
+                                                                                can be largely decreased.
+                                                                                   We utilize structural sparsity into the weight parameters
+                                                                                in the matrix multiplication operator. During the execution
+                                                                                of matrix multiplication, a broader range of activation data
+                                                                                is initially fed into the system. Subsequently, the neces-
+                                                                                sary activation data is selectively picked out based on the
+                                                                                mask within the weight parameters. Finally, both the selected
+                                                                                activation data and the weight data are jointly directed into the
+                                                                                computational array for processing. An efficient sparse DMA
+                                                                                has been designed for the feature data.
+                                                                                   For the weight data, block quantization [21], [22] and hybrid
+Firstly, the total area of our design is only 71664 µm2 ,                       sparsity schemes are used, wherein 128 adjacent parameters
+while baseline-1 (with FP16 based adder-tree) is 80,675 +                       are symmetrically quantized and share the same quantization
+26,762= 107,437 µm2 , and that of baseline-2 (with FP20                         scale parameter. The log-scale mix sparsity is defined as that
+based adder-tree) is 140,677µm2 , showing 33.2% area reduc-                     every group of eight adjacent data blocks must contain at least
+tions when compared with baseline 1 and 49.1%-decrease with                     N zeros, meanwhile the others are non-zeros. For example,
+baseline 2. Secondly, our module outperforms competitors in                     when the sparsity is 75%, it means each eight adjacent data
+clock frequency, achieving a peak of 1.11GHz on a 28nm                          blocks must contain at least 6 zeros and at most 2 non-zeros.
+CMOS, which is good enough for the practical application.                       Based on these analyses, the parameters can be categorized
+Lastly, concerning power consumption, baseline-1, due to its                    into three types: quantization scales, masks, and the weights
+inherently lower computational complexity in FP16 operations,                   themselves, all of which will be stored in HBM. Given that
+naturally incurs the least power draw (35.03 + 14.66 =                          the single HBM AXI-port in this FPGA has a bit width of
+49.69 mW). Nevertheless, our scheme exhibits only 2% incre-                     256 bits, and each quantization scale is of FP16 data type, the
+ment in power consumption (40.34mW for FP16∗INT4, and                           group size will be 256/16 ∗ 128 = 2048 input channel groups
+10.39mW for FP16∗FP16), demonstrating excellent efficiency.                     (CHin ).
+When compared with the baseline-2, our method shows much                           Fig. 5 illustrates the classic weight data shape. Firstly,
+less consumption power and circuit area. These attributes                       we pack together all weight parameters belonging to the same
+confirm our approach as the optimal PPA performance.                            CHout . For example, all data with CHout indices 0, 32, 64 will
+                                                                                be sequentially placed in HBM-AXI-port00, and all data with
+C. Further Optimization With Log-Scale Sparsity                                 CHout indices 1, 33, 65 will be sequentially placed in HBM-
+   Large language models often contain billions of param-                       AXI-port01, and so on. Then, for each weight package, it is
+eters. This massive size presents significant challenges in                     divided into CHin /2048 portions, and any portion with fewer
+terms of storage, memory, and computational efficiency, espe-                   than 2048 channels will be padded to 2048. Each portion is
+cially when deploying these models on devices with limited                      arranged in the order of scale, mask, and wt.
+resources or when attempting to scale up distributed training                      Case-1: when the model is dense, the 2048 CHin groups
+processes. INT4 quantization, which represents weights using                    contain 2048 ∗ 4 = 8192 bits of INT4 weights, and contains
+4-bit integers instead of the typical 32-bit or 16-bit floating-                (2048/128) ∗ 16 = 256bits of FP16 scale. Therefore the total
+point numbers, offers several advantages: higher memory                         ratio of scale-to-mask-to-wt will be 256:0:8192 = 1:0:32.
+efficiency, higher computation speed and better bandwidth                          Case-2: when layer sparsity of the model is 50%,
+optimization, thus has been widely used in the inference                        the 2048 CHin groups contain 2048 ∗ 4 ∗ 50% = 4096 bits
+of LLM. Furthermore, structured sparsity offers significant                     of INT4 weights. Here we use one-hot encoding scheme for
+advantages. It boosts computational speed by skipping zero                      the non-zero mask, such that the 2048 CHin groups contain
+weights, reduces storage needs for large models, saves energy,                  2048 bits of mask. And the total ratio of scale-to-mask-to-wt
+and enables complex models to run on devices with limited                       will be 256:2048:4096 = 1:8:16. Note, if the address-in-block
+resources, all while maintaining accuracy.                                      scheme (this encoding scheme directly indicates the offset
+   Density bound block (DBB) based structured sparsity has                      address of each weight) was used, each 2048 CHin group
+proven to be an effective method, but it is still an open                       will contain 4096 bits for the mask, which is not efficient
+question to explore which kind of structure sparse is the                       here.
+
+        Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                        3359
+
+
+
+                                                                                                                   TABLE II
+                                                                                              C OMPARISON OF D IFFERENT S PARSE S TRATEGIES
+
+
+
+
+                                                                                 while the algorithm’s accuracy remains at a high level [21].
+                                                                                 Compared with previous work, our main innovation is that
+                                                                                 the hardware support mixed-sparsity, allowing us to select
+                                                                                 different sparsity levels for different operator layers. For
+Fig. 5. Customized weight parameters package method and analysis of the          example, the QKVO layer can be 50% sparsity, while the h-to-
+effective weight bit-width and performance enhancement at different log-scale    4h layer can be 75% sparsity and so on. Most critically, due to
+mix sparsity.                                                                    both M and N are powers of two in our design, the hardware
+                                                                                 computing units can always achieve 100% computational
+   Case-3: when the layer sparsity is 75%, the one-hot                           efficiency across different sparsity. Besides, our sparse blocks
+encoding mask requires 2048 bits, while the weight data                          are larger; for instance, for the same 50% sparsity, GPU
+will be 2048∗25%∗4 = 2048 bits. Consequently, the total                          uses 2:4, whereas we can use 4:8, 8:16, or 32:64. Although
+ratio of scale-to-mask-to-wt will be 256:2048:2048 = 1:8:8.                      this increases hardware costs, it results in better performance
+If address-in-block method was used, the mask would need                         at the algorithmic level. Furthermore, we proposed hybrid
+1536bits, therefore the total ratio of scale-to-mask-to-wt will                  encoding scheme to record the position of non-zero weight,
+be 256:1536:2048 = 1:6:8.                                                        in which both one-hot encoding scheme (in low sparsity) and
+   Case-4: when the layer sparsity of the model is 87.5%,                        address-in-block scheme (in high sparsity) were used to further
+the one-hot encoding mask requires 2048 bits, and the weight                     improve the efficiency.
+data will be 2048∗12.5%∗4 = 1024 bits. Therefore, the total
+ratio of scale-to-mask-to-wt will be 256:2048:1024 = 1:8:4.                                              IV. S OFTWARE D ESIGN
+When the sparsity is very high, the cost of the address-in-block                   In this section, we will introduce the compilation strategies
+method is more efficient. As shown in Fig. 5, the 2048 CHin                      aimed at optimally executing the hardware operators.
+groups contain only 1024 bits of mask. Therefore, the total cost
+is 2304 bits, and the performance enhancement ratio reaches
+as high as 3.66× at 87.5% sparsity.                                              A. Unified Data Format Based LLM Operator Graph
+   According to the above analysis, the effective weight                            When executing an artificial intelligence model, the com-
+bit-width is 4.125bit, 3.125bit, 1.875bit, and 1.125bit,                         pilation process of the system relies on the operator graph
+respectively. And the performance enhancement ratio will                         to achieve coherence and efficiency. Fig. 6 depicts the case
+be 1.32×, 2.2×, 3.67× at different sparsity. In summary,                         of ChatGLM-6B, in which one block will be fused into
+the structured log-scale sparse offers several advantages:                       17 hardware steps. The key feature is that each operator’s
+higher memory efficiency, higher computation speed and better                    inputs and outputs maintain a consistent data structure to
+bandwidth optimization.                                                          achieving optimal execution speed. This consistency allows
+   Table II shows the GLM-6B algorithm performance under                         for smooth transitions from one operator to the next.
+different sparse strategies. After simplification through mixed-                    To maintain a consistent data structure, we developed a
+sparsity, the total amount of weight parameters (along with                      universal data parallelism scheme for LLM operators. The
+positional encoding parameters) can be significantly reduced,                    scheme is generic and can be adapted to any type of AI
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+3360                                                    IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+
+                                                                                 Fig. 7. The data packaging method in the accelerator, which ensures all input
+                                                                                 and output features maintain the same data shape, enables different operators
+                                                                                 to process the data without any rearrangement.
+Fig. 6. Optimized operator graph, in which the light green boxes represent
+FP16∗INT4 MatMUL, light blue boxes represent HBM-KVcache, and light
+yellow boxes represent FP16∗FP16 MatMUL operators related to KVcache.            data, namely [token, Tout ] in a contiguous block of addresses.
+                                                                                 Using this data structure, we can design a segmented continu-
+                                                                                 ous execution of the transpose operation, thus eliminating the
+algorithm. The text-type input/output activation data innately                   need to change the data format.
+embodies a two-dimensional structure of (tokens, channels).                         Another advantage lies in the maximization of efficiency in
+The data can be easily transformed into three-dimensional                        leveraging AXI burst transfers, which refers to the ability of
+tensor representation, namely [CH/Tout , token, Tout ]. Here,                    transferring multiple consecutive data in a single transaction,
+Tout represents the parallelism degree in data channel direc-                    rather than initiating new transactions. In our design, the
+tion. Similarly, the image-type input/output activation data,                    data-width in both AXI write-mode and AXI read-mode is
+which is originally characterized by height (H), width (W), and                  fixed at Tout ∗16, which is just the same as the smallest
+channels (CH) can be transformed into four-dimensional tensor                    data package in [Batch, CH/Tout , H, W, Tout ]. Therefore, the
+representation of [CH/Tout , H, W, Tout ]. It can be seen that,                  incremental address in AXI burst transfer will exactly be the
+the text-type and image-type data are sharing with the same                      width-dimension or token-dimension in the tensor. This allows
+tensorization scheme. Such unification not only streamlines                      for efficient sequential data access, making it particularly
+data handling but also underscores the inherent compatibility                    useful for reading or writing blocks of data in memory.
+of tensor representations across diverse data modalities.
+   Moreover, in scenarios where multi-head attention mech-
+anisms introduce an additional head dimension, or batch                          B. Software Architecture and LLM Inference Systems
+dimension, the data dimensions can be expanded analogously                          In addition to the hardware operator design, this work also
+as [head or Batch, CH/Tout , H, W, Tout ], ensuring the frame-                   focuses on software and optimization on the deployment of
+work remains versatile. Take the ChatGLM model as an                             LLM. Fig. 8 shows the compilation and deployment of LLM
+example. The shape of the input is (token, 4096), and weight                     on VCU128 FPGA platform. After sparse and quantized, the
+matrix of Wq is (4096, 4096), of Wk and Wv is (4096,                             LLM will be imported into the compiler, and the compiler
+256). After the matrix multiplication, we will get the three                     will do special optimization including dynamic control and
+matrixes of Query-Key-Value in (token, 4096), (token, 256),                      KV-cache, and finally generate instructions, pre-processing
+(token, 256), respectively. The Query-Key-Value matrix will                      weights and runtime control code according to the charac-
+be further embedded and reshaped according to the head num-                      teristics of the accelerator to facilitate model deployment.
+bers, generating a three-dimensional matrix of (head, token,                     According to the compiled model, we designed a set of LLM
+4096/head). Next, the context information will be calculated                     inference framework based on LAN (local area network).
+by Q∗KT , in which Q is the Query matrix, KT is the transpose                    It uses FPGA and the deployed LLM as the server side, which
+of Key matrix. Then the attention matrix will be performed                       is responsible for the actual inference of the LLM. Python is
+by Softmax and finally multiplied by the Value matrix.                           used to act as the client to encode and decode the token ids,
+   It should be noted that K and V are generated by the former                   and conducting direct interaction with users. Furthermore, the
+MatMUL of K=input∗Wk and V=input∗Wv , respectively.                              appropriate configuration data for the operator registers needs
+Therefore, both KT and V can not be pre-treated during the                       to be meticulously prepared, ensuring that all components are
+inference process. Besides, the transpose operation breaks the                   correctly initialized for the upcoming testing phase.
+data access pattern for the V matrix, hampering the continuity                      In the LLM inference stage, first of all, in order to sim-
+needed for fine-grained pipelines and necessitating coarse-                      plify the dynamic addresses for all operators, the compiler
+grained pipelines. Remarkably, the universal data structure                      introduces the MAX Token attribute from RTL Macro Define.
+introduced in this work is well-suited to solve such problem.                    It replaces the dynamic token in the calculation of the memory
+Since all of the activation data can be formed in shape of                       space size and address of dynamic data to make the address
+[CH/Tout , token, Tout ], there naturally exists two dimensions of               static, reducing additional computation at runtime. Secondly,
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                         3361
+
+
+
+
+                                                                                  Fig. 9.   Latency hiding in the inference stage.
+
+
+Fig. 8.   Compilation and deployment of LLM on VCU128 FPGA platform.
+
+
+hardware instructions also need to adapt to dynamic token.
+When the compiler evaluates the hardware instructions for the
+corresponding operator, the token is involved as a Variable
+and the parameters are recorded as numeric expressions in the
+form of Directed Acyclic Graph (DAG). If this parameter can
+be evaluated directly, the compiler returns the result of this
+instruction, otherwise it is embedded in the runtime code in
+the form of a simplified code expression for real-time updates.
+In this approach, the hardware instructions require very little
+space, making the inference space of KVcache very sufficient.
+   In addition, since the effective data of all operators after the
+last attention structure is only on the vector of the last token,
+the compiler makes additional optimization on this, and gives
+the actual data offset according to the token parameter. The
+data of the last token is removed for subsequent calculations
+to minimize the amount of computation.
+   Lastly, our design provides pre-configured register mode                       Fig. 10.   Experimental setup for the CPU-FPGA heterogeneous system.
+                                                                                  The sub paragraph shows the decode speed and zero-shot accuracy on four
+with auxiliary path to realize the mode operation of instruction                  benchmarks: Arc-C, Arc-E, BoolQ, and Winogrande.(see TABLE-II).
+pipeline, the compiler can provide the optimization of delay
+hiding in the inference stage (Fig. 9). The accelerator auxiliary
+mode can encode multiple serialized operator instructions                         with 1303K logic elements (LUT), 2607K FF, 9024 DSP
+directly from the on-chip DDR to the buffer via the AXI bus.                      blocks, and 2016 Block RAMs on chip. Besides, the FPGA
+In the host control of the accelerator, only the configuration                    is equipped with 8GB HBM with 460GB/s bandwidth, which
+information of the given serialization instruction needs to                       is well-suited for the acceleration of GB-level large language
+be written to the register, such as the address information,                      models. Fig. 10 depicts the experimental setup for the system.
+the number of valid operators, etc. The accelerator will                          The host computer (CPU) controls the DDR and HBM via the
+then complete the rapid start and continuous operation of                         Peripheral Component Interconnect Express (PCIe) bus. And it
+the serialization instructions. After the accelerator reads the                   leverages the AXI lite protocol to interact with the accelerator
+instructions, the host has additional time to perform other                       IP’s internal register array, thereby exercising control over the
+calculations before completing the accelerator calculation.                       accelerator’s operational dynamics.
+As is shown in Fig. 9, the delay required for dynamic                                The matrix multiplication operator, due to its extremely high
+control instruction updates can be hidden in the time waiting                     demand for handling vast quantities of parameters, is con-
+for accelerator calculations to complete. Then, in practical                      nected with HBM in high frequency of 280MHz. While the
+inference, we only need to update the complete instruction                        other parts and operators work in 140MHz. The operation
+before the first model inference, and subsequent instruction                      frequency can be further increased due to timing optimization.
+updates will be hidden in the last model inference.                                  The sub-paragraph in Fig. 10 exhibits the experiment results
+                                                                                  on the acceleration GLM-6B, in which different sparse strate-
+                    V. E XPERIMENTAL R ESULTS                                     gies have been considered. For the original model provided
+  In this section, we show the experiment results on                              by the official source [38], our chip computation has almost
+accelerating LLM modes using AMD Xilinx VCU128 board.                             no accuracy loss. After sparsity optimization, the accuracy has
+                                                                                  been slightly decreased, but the model’s speed has increased
+A. Experiment Setup                                                               by approximately 63%. Besides, we have also measured
+  The proposed accelerator has been synthesized and imple-                        the Qwen-7B LLM model [39]. The Qwen decoding speed
+mented using Vivado 2023.1 on AMD Xilinx VCU128 board                             (42.5 token/s ∼ 69.4 token/s) is slower than that of GLM,
+
+          Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+3362                                                      IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+
+Fig. 11.   Acceleration performance on the dense GLM-6B model.                     Fig. 12.   Acceleration performance on the sparse GLM-6B model.
+
+
+which is not only because of the less FFN parameters, but also                     shows the prefill runtime, respectively. Due to the increase of
+comes from the highly shared weight-heads in MHA blocks.                           token length in prefill, the corresponding computation latency
+                                                                                   will increase proportionally. In such cases, the bottleneck of
+                                                                                   the system will be the computation throughput, rather than the
+B. Analysis on the Hardware Efficiency                                             data access. Fig. 12 shows the performance on the acceleration
+   Efficiency of HBM bandwidth utilization is a key point in                       of sparse GLM model, the first decode delay is only 10.8 ms,
+AI chips. The efficiency can be calculated by the division of                      corresponding a peak speed about 85.8 token/s at a power of
+real_operation_time and ideal_operation_time. Take the GLM                         56.86W, showing 1.91× higher throughput and 7.55× higher
+model as an example, the shape of input is (token, 4096), and                      energy efficiency than GPU [38].
+weight matrix of Wq is (4096, 4096). In the decode stage, the                         We also measured the Qwen-7B model [39], and all results
+input token will always be 1, so the ideal_operation_time will                     are quite similar to that of GLM-6B. In Qwen-7B model, the
+be 4096∗4096∗4bit / (8192 bit/cycle) ∗ 3.571ns = 29.25µs.                          decoding speed using sparse strategy-3 is 69.4token/s, which
+Meanwhile the real_operation_time can be directly measured                         is slower than GLM-6B due to the larger number of VMM
+to be 38.5µs, therefore the HBM bandwidth utilization is                           parameters (7B vs. 6B), and more KV heads (4 vs. 2) in MHA
+29.25µs/38.5µs = 75.97%. Similarly, we can calculate the                           block with longer latency in KVcache parameters loading.
+utilization of each MatMUL layer and finally observe that they                        To demonstrate the high efficiency of our EdgeLLM frame-
+all lie between 70% and 80%, and the average is about 75%.                         work, we have done additional experiments and evaluated our
+   Fig. 11 shows the performance on the acceleration of                            accelerator’s performance on a non-HBM system, where DDR
+GLM-6B model. The decode speed remains relatively stable                           is used instead. In edge system, DDR is the most common
+(∼90 token/s) when the decoding token is less than 512.                            seen memory chips with about 60 GB/s bandwidth. As shown
+Fig. 11(b) shows the detailed latency breakdown. The whole                         in the TABLE III, we present both decoding and prefill test
+model can be divided into three parts, namely multi-head atten-                    cases. It can be observed that, in decode mode, the primary
+tion (MHA), feed forward networks (FFN), and the others.                           bottleneck of the DDR system lies in several operators related
+The runtime of FFN is independent to the decode length, but                        to Matrix-Vector Multiplication. This results in the token
+the runtime of MHA has a quadratic relationship with input                         generation speed in decoding stage being only about 25% of
+token length. With the token increasing, the MHA latency                           that of the HBM system. In prefill stage, due to the reusability
+will gradually dominate the system. Fig. 11(c) and Fig. 11(d)                      of weight parameters, which reduces the system’s demand for
+
+           Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                      3363
+
+
+
+                              TABLE III                                                                          TABLE V
+           E VALUATION OF E DGE LLM ON DDR S YSTEM                                        E FFICIENCY C OMPARISON ON D IFFERENT P LATFORMS
+
+
+
+
+                                                                               due to the high bandwidth of HBM workload and intensive
+                                                                               computations.
+                                                                                  Table V shows the efficiency comparison on different plat-
+                                                                               forms. GPU is widely used in LLMs. When accelerating large
+                                                                               batch size data (typically for cloud scenarios), their perfor-
+                                                                               mance and efficiency are very high. However, when the batch
+                                                                               size is 1 (typically for edge application scenarios), the effi-
+                                                                               ciency becomes typically lower than 30%. Besides, the energy
+                                                                               consumption of GPU is also very high. FlightLLM [16] is
+                                                                               currently state-of-the-art FPGA accelerator, enabling efficient
+                                                                               LLMs inference with ∼66% bandwidth utilization and 6×
+                                                                               better energy efficiency than GPU. Attributable to the syn-
+                                                                               ergistic effects, our integrated solution showcases enhanced
+                                                                               performance over the FlightLLM by 11%-higher bandwidth
+                          TABLE IV
+                                                                               utilization and up to 24% higher energy efficiency, showing
+         E NERGY C ONSUMPTION OF D IFFERENT O PERATORS
+                                                                               great potential for the practical edge-AI application.
+                                                                                  Currently, almost all of the LLMs follow similar operator
+                                                                               structures: MHA+FFN. We have implemented comprehensive
+                                                                               optimizations on the above operators such that our frame-
+                                                                               work has great general applicability and can be easily to be
+                                                                               applied to other types of LLMs besides GLM and Qwen.
+                                                                               However, based on our analysis, the potential limitation is the
+                                                                               RotaryEmbedding operator, which usually varies at different
+                                                                               LLM models. To execute such operator, two methods can be
+                                                                               used: one is the custom-designed operator for different models,
+                                                                               and the other one is using CPU + ElementWiseOperator.
+                                                                               The former one shows high hardware efficiency for specific
+                                                                               model but can not be directly used for any other model, while
+communication bandwidth, the speed reduction is relatively                     the later one shows higher general applicability but with low
+lower. And further experiments show that if the prefill token                  speed. Besides, all operators in this proposal are executed in
+length was larger, the performance decrease of DDR system                      a temporal-mode, with one operator starting only after the
+will become even smaller. Overall, though the token generation                 previous one has finished. Future optimizations could explore
+speed in both prefill and decode stage will be decreased in pure               the parallel execution of different operators.
+DDR system, the permanence of our EdgeLLM is still good
+enough for edge applications.
+                                                                                                           VI. C ONCLUSION
+   TABLE IV shows the energy consumption when acceler-
+ating each single operator. Overall, the normalized average of                    This study proposes EdgeLLM, a high-performance
+the FPGA is 56.86W at 140/280MHz, in which the standby                         CPU-FPGA heterogeneous acceleration scheme for LLM.
+power (after loading the 140/280MHz bitstream) is 40.36 W.                     In terms of hardware, we analyzed the computational require-
+It can be seen that most of the nonlinear function (such as Lay-               ments of FFN and MHA, and proposed high efficiency
+erNorm/RMSNorm, Rotary Embedding, Softmax) consumes                            mix-precision computation unit together with group systolic
+about 41 W, corresponding to a net power to be only ∼0.7W.                     architecture. Meanwhile specific optimization on log-scale
+While the matrix-multiplication based operators show relative                  structured weight sparsity was proposed, though the algorithm
+higher power consumption ranges from 2W to 18W, mainly                         accuracy has been slightly decreased, the hardware efficiency
+
+       Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+3364                                                    IEEE TRANSACTIONS ON CIRCUITS AND SYSTEMS—I: REGULAR PAPERS, VOL. 72, NO. 7, JULY 2025
+
+
+
+can be largely increased. In terms of software, we analyzed the                  [19] M. Huang et al., “A high performance multi-bit-width booth vector
+whole operator graph, and devised a unified and universal data                        systolic accelerator for NAS optimized deep learning neural networks,”
+                                                                                      IEEE Trans. Circuits Syst. I, Reg. Papers, vol. 69, no. 9, pp. 3619–3631,
+format for all of the operators within AI algorithms, enabling                        Sep. 2022, doi: 10.1109/TCSI.2022.3178474.
+different operators to process without any data rearrangement.                   [20] M. Huang, J. Luo, C. Ding, Z. Wei, S. Huang, and H. Yu, “An integer-
+Then we propose end-to-end compilation scheme that can                                only and group-vector systolic accelerator for efficiently mapping vision
+                                                                                      transformer on edge,” IEEE Trans. Circuits Syst. I, Reg. Papers, vol. 70,
+dynamically compile all of the operators and map the whole                            no. 12, pp. 5289–5301, Dec. 2023, doi: 10.1109/TCSI.2023.3312775.
+model. This solution has good versatility and can be adapted to                  [21] Y. Su et al., “LLM-barber: Block-aware rebuilder for sparsity mask in
+multiple large model algorithms. For instance, the accelerator                        one-shot for large language models,” 2024, arXiv:2408.10631.
+has been successfully deployed on AMD Xilinx VCU128                              [22] J. Lin et al., “AWQ: Activation-aware weight quantization for on-device
+                                                                                      LLM compression and acceleration,” in Proc. Mach. Learn. Syst., vol. 7,
+FPGA platform. Our result achieves 1.91× higher throughput                            2024, pp. 87–100.
+and 7.55× higher energy efficiency than GPU NVIDIA A100-                         [23] Z. Liu et al., “Deja Vu: Contextual sparsity for efficient LLMS at infer-
+SXM4-80G, and shows about 10∼24% higher performance                                   ence time,” in Proc. Int. Conf. Mach. Learn., 2023, pp. 22137–22176.
+                                                                                 [24] E. Frantar and D. Alistarh, “SparseGPT: Massive language models can
+than state-of-the-art FPGA accelerator of FlightLLM. Overall,                         be accurately pruned in one-shot,” in Proc. Int. Conf. Mach. Learn.,
+EdgeLLM addresses the issues of intensive computational                               2023, pp. 10323–10337.
+requirements, heavy memory access, diverse operator types,                       [25] Z. Liu et al., “Scissorhands: Exploiting the persistence of importance
+                                                                                      hypothesis for llm KVcache compression at test time,” in Proc. Adv.
+difficulties in compilation of LLMs, showing great potential                          Neural Inf. Process. Syst., vol. 36, 2023, pp. 52342–52364.
+for the practical application in edge scenarios (such as robots)                 [26] C. Raffel et al., “Exploring the limits of transfer learning with a
+in the near future.                                                                   unified text-to-text transformer,” J. Mach. Learn. Res., vol. 21, no. 140,
+                                                                                      pp. 1–67, 2020.
+                                                                                 [27] L. Xue et al., “MT5: A massively multilingual pre-trained text-to-text
+                              R EFERENCES                                             transformer,” 2020, arXiv:2010.11934.
+                                                                                 [28] T. Glm et al., “ChatGLM: A family of large language models from
+ [1] D. Silver et al., “Mastering the game of go with deep neural networks            GLM-130B to GLM-4 all tools,” 2024, arXiv:2406.12793.
+     and tree search,” Nature, vol. 529, no. 7587, pp. 484–489, Jan. 2016,       [29] R. Anil et al., “PaLM 2 technical report,” 2023, arXiv:2305.10403.
+     doi: 10.1038/nature16961.                                                   [30] OpenAI. (2024). Sora: Creating Video from Text. [Online]. Available:
+ [2] K. Simonyan and A. Zisserman, “Very deep convolutional networks for              https://openai.com/sora
+     large-scale image recognition,” 2014, arXiv:1409.1556.                      [31] N. Jouppi et al., “In-datacenter performance analysis of a tensor process-
+ [3] K. He, X. Zhang, S. Ren, and J. Sun, “Deep residual learning for                 ing unit,” in Proc. 44th Annu. Int. Symp. Comput. Architect., Toronto,
+     image recognition,” in Proc. IEEE Conf. Comput. Vis. Pattern Recognit.           ON, Canada, Jun. 2017, pp. 1–12, doi: 10.1145/3079856.3080246.
+     (CVPR), Jun. 2016, pp. 770–778, doi: 10.1109/CVPR.2016.90.                  [32] N. Jouppi et al., “TPU v4: An optically reconfigurable supercomputer
+ [4] A. Vaswani et al., “Attention is all you need,” in Proc. Adv. Neural Inf.        for machine learning with hardware support for embeddings,” in Proc.
+     Process. Syst., Long Beach, CA, USA, 2017, pp. 5998–6008.                        50th Annu. Int. Symp. Comput. Archit., Jun. 2023, pp. 1–14, doi:
+ [5] J. Devlin, M.-W. Chang, K. Lee, and K. Toutanova, “BERT: Pre-training            10.1145/3579371.3589350.
+     of deep bidirectional transformers for language understanding,” 2018,       [33] H. Peng et al., “Accelerating transformer-based deep learning mod-
+     arXiv:1810.04805.                                                                els on FPGAs using column balanced block pruning,” in Proc.
+ [6] A. Dosovitskiy et al., “An image is worth 16×16 words: Transformers              Int. Symp. Quality Electron. Design, 2021, pp. 142–148, doi:
+     for image recognition at scale,” 2020, arXiv:2010.11929.                         10.1109/ISQED51717.2021.9424344.
+ [7] J. Deng, W. Dong, R. Socher, L.-J. Li, K. Li, and L. Fei-Fei, “ImageNet:    [34] T. Wang et al., “ViA: A novel vision-transformer accelerator
+     A large-scale hierarchical image database,” in Proc. IEEE Conf. Comput.          based on FPGA,” IEEE Trans. Comput.-Aided Design Integr. Cir-
+     Vis. Pattern Recognit., Miami, FL, USA, Jun. 2009, pp. 248–255, doi:             cuits Syst., vol. 41, no. 11, pp. 4088–4099, Nov. 2022, doi:
+     10.1109/CVPR.2009.5206848.                                                       10.1109/TCAD.2022.3197489.
+ [8] T. Y. Lin et al., “Microsoft COCO: Common objects in context,” in           [35] C. Zhang, P. Li, G. Sun, Y. Guan, B. Xiao, and J. Cong, “Optimizing
+     Proc. Eur. Conf. Comput. Vis., in Lecture Notes in Computer Sci-                 FPGA-based accelerator design for deep convolutional neural networks,”
+     ence, vol. 8693, Cham, Switzerland: Springer, 2014, pp. 740–755, doi:            in Proc. ACM/SIGDA Int. Symp. Field-Program. Gate Arrays, Feb. 2015,
+     10.1007/978-3-319-10602-1_48.                                                    pp. 161–170, doi: 10.1145/2684746.2689060.
+ [9] R. Bommasani et al., “On the opportunities and risks of foundation          [36] Z.-G. Liu, P. N. Whatmough, Y. Zhu, and M. Mattina, “S2TA:
+     models,” 2021, arXiv:2108.07258.                                                 Exploiting structured sparsity for energy-efficient mobile CNN
+[10] E. Kasneci et al., “ChatGPT for good? On opportunities and challenges            acceleration,” in Proc. IEEE Int. Symp. High-Perform. Comput.
+     of large language models for education,” Learn. Individual Differences,          Archit. (HPCA), Seoul, South Korea, Apr. 2022, pp. 573–586, doi:
+     vol. 103, Apr. 2023, Art. no. 102274, doi: 10.1016/j.lindif.2023.102274.         10.1109/HPCA53966.2022.00049.
+[11] (2023). OpenAI. [Online]. Available: https://chat.openai.com.chat           [37] NVIDIA A100 Tensor Core GPU Architecture, NVIDIA White-
+[12] A. Chowdhery et al., “PaLM: Scaling language modeling with path-                 paper, Santa Clara, CA, USA, 2021. [Online]. Available:
+     ways,” 2022, arXiv:2204.02311.                                                   https://images.nvidia.cn/aem-dam/en-zz/Solutions/data-center/nvidia-
+[13] A. J. Thirunavukarasu, D. S. J. Ting, K. Elangovan, L. Gutierrez,                amperearchitecture- whitepaper.pdf
+     T. F. Tan, and D. S. W. Ting, “Large language models in medicine,”          [38] [Online]. Available: https://github.com/THUDM/ChatGLM2-6B
+     Nature Med., vol. 29, no. 8, pp. 1930–1940, Aug. 2023, doi:                 [39] [Online]. Available: https://github.com/vitanova/Qwen2
+     10.1038/s41591-023-02448-8.
+[14] W. Xin Zhao et al., “A survey of large language models,” 2023,
+     arXiv:2303.18223.
+[15] D. Demszky et al., “Using large language models in psychology,” Nature
+     Rev. Psychol., vol. 2, pp. 688–701, Oct. 2023, doi: 10.1038/s44159-023-                               Mingqiang Huang received the B.S. and Ph.D.
+     00241-5.                                                                                              degrees in physics from Huazhong University of
+[16] S. Zeng et al., “FlightLLM: Efficient large language model inference                                  Science and Technology, Wuhan, China, in 2013 and
+     with a complete mapping flow on FPGAs,” in Proc. ACM/SIGDA                                            2018, respectively. From 2018 to 2019, he was a
+     Int. Symp. Field Program. Gate Arrays, Apr. 2024, pp. 223–234, doi:                                   Research Fellow with Nanyang Technological Uni-
+     10.1145/3626202.3637562.                                                                              versity, Singapore. Since November 2019, he has
+[17] Z. Li and Q. Gu, “I-ViT: Integer-only quantization for efficient vision                               been with Shenzhen Institute of Advanced Technol-
+     transformer inference,” 2022, arXiv:2207.01405.                                                       ogy, Chinese Academy of Sciences, as a Research
+[18] B. Li et al., “FTRANS: Energy-efficient acceleration of transformers                                  Associate Professor. His current research interests
+     using FPGA,” in Proc. ACM/IEEE Int. Symp. Low Power Electron.                                         include energy-efficient computing and artificial
+     Design, Aug. 2020, pp. 175–180, doi: 10.1145/3370748.3406567.                                         intelligence (AI) hardware accelerators.
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+HUANG et al.: EdgeLLM: A HIGHLY EFFICIENT CPU-FPGA HETEROGENEOUS EDGE ACCELERATOR                                                                         3365
+
+
+
+                      Ao Shen is currently pursuing the master’s degree                                  Boyu Li received the B.S. degree from the School
+                      in microelectronics science and engineering with                                   of Microelectornics, Southern University of Science
+                      the School of Microelectronics, Southern University                                and Technology, Shenzhen, China, in 2022. He is
+                      of Science and Technology, Shenzhen, China. His                                    currently pursuing the Ph.D. degree with the Depart-
+                      research interests include neural network compiler                                 ment of Electrical and Electronic Engineering, The
+                      and digital system design.                                                         University of Hong Kong, Hong Kong. And, he
+                                                                                                         is also a visiting student with Southern Univer-
+                                                                                                         sity of Science and Technology now. His current
+                                                                                                         research interests include deep learning, digital sys-
+                                                                                                         tem design, and neural network acceleration.
+
+
+
+
+                                                                                                         Yupeng Su is currently a senior student with the
+                                                                                                         School of Microelectronics, Southern University
+                                                                                                         of Science and Technology, Shenzhen, China. His
+                                                                                                         research interests include efficient and low-resource
+                      Kai Li is currently pursuing the Ph.D. degree                                      methods for NLP, model deployment on edge, and
+                      in microelectronics science and engineering with                                   AI accelerators design.
+                      the School of Microelectronics, Southern University
+                      of Science and Technology, Shenzhen, China. His
+                      research interests include deep learning and neural
+                      network acceleration.
+
+
+
+
+                                                                                                        Hao Yu (Senior Member, IEEE) received the Ph.D.
+                                                                                                        degree in electrical engineering from the University
+                                                                                                        of California at Los Angeles, USA, in 2007. He is
+                                                                                                        currently with the Southern University of Science
+                                                                                                        and Technology, Shenzhen, China. His research
+                                                                                                        interests include energy-efficient data links, sensors,
+                                                                                                        and analysis. He is a Senior Member of ACM.
+                                                                                                        He has about 282 peer-reviewed IEEE/ACM pub-
+                                                                                                        lications; three best paper award nominations for
+                      Haoxiang Peng is currently pursuing the master’s                                  Design Automation Conference in 2006, Interna-
+                      degree in microelectronics science and engineering                                tional Conference on Computer-Aided Design in
+                      with the School of Microelectronics, Southern Uni-       2006, and International Conference on VLSI Design Automation in Asia
+                      versity of Science and Technology, Shenzhen, China.      and South Pacific Region in 2012. He is an Associate Editor of Scien-
+                      His research interests include deep learning, digital    tific Reports (Nature), IEEE T RANSACTIONS ON B IOMEDICAL C IRCUITS
+                                                                               AND S YSTEMS, ACM Transactions on Embedded Computing Systems, and
+                      system design, and neural network acceleration.
+                                                                               Microelectronics (Elsevier); and a Technical Program Committee Member of
+                                                                               IEEE Custom Integrated Circuits Conference, IEEE Asian Solid-State Circuits
+                                                                               Conference, ACM-DAC, and ACM Design, Automation and Test in Europe
+                                                                               Conference and Exhibition; and of many IEEE/ACM international journals
+                                                                               and conferences.
+
+
+
+
+       Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:16:49 UTC from IEEE Xplore. Restrictions apply.
+

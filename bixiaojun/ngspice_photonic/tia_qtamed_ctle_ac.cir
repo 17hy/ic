@@ -1,0 +1,55 @@
+* TIA + cascaded Q-tamed CTLE macro model
+* Based on Fig. 23.3.2. Topology/behavior-level only.
+* It models a 62 dB-ohm TIS pole and two gm-Zt CTLE paths.
+
+.options reltol=1e-6 abstol=1e-12 vntol=1e-9
+.param rf=1259
+.param cin=2.9f
+.param gm=7m
+.param re=50
+.param ce=180f
+.param rload=200
+.param cload=20f
+.param l41=754p
+.param l36=980p
+.param l48=550p
+
+IIN tis 0 AC 1
+RF tis 0 {rf}
+CIN tis 0 {cin}
+
+* Without QTP: two coincident peaking stages around 41 GHz, high-Q/narrower response.
+Xn1 tis n1 ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} lpk={l41} cload={cload} rser=14
+Xn2 n1 out_noq ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} lpk={l41} cload={cload} rser=14
+
+* With QTP: split the two stage resonances and add a damped mid-band feed-forward path.
+Xq1 tis q1 ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} lpk={l36} cload={cload} rser=30
+Xq2 q1 out_q ctle_stage params: gm={gm} re={re} ce={ce} rload={rload} lpk={l48} cload={cload} rser=30
+* QTP macro: damping and added small capacitance reduce the coincident high-Q peak.
+RQTP out_q 0 1.2k
+CQTP out_q 0 2f
+
+.subckt ctle_stage in out params: gm=7m re=50 ce=180f rload=200 lpk=754p cload=20f rser=20
+Gm out em value={gm*V(in,em)}
+Re em 0 {re}
+Ce em 0 {ce}
+Lpk out lp {lpk}
+Rser lp rz {rser}
+Rload rz 0 {rload}
+Cload out 0 {cload}
+.ends ctle_stage
+
+.ac dec 300 100meg 80gig
+.control
+run
+meas ac gain_q_1g FIND vdb(out_q) AT=1e9
+meas ac gain_noq_1g FIND vdb(out_noq) AT=1e9
+meas ac gain_q_41g FIND vdb(out_q) AT=41e9
+meas ac gain_noq_41g FIND vdb(out_noq) AT=41e9
+meas ac gain_q_20g FIND vdb(out_q) AT=20e9
+meas ac gain_noq_20g FIND vdb(out_noq) AT=20e9
+print gain_q_1g gain_noq_1g gain_q_20g gain_noq_20g gain_q_41g gain_noq_41g
+wrdata tia_qtamed_ctle_ac.csv frequency vdb(out_q) vdb(out_noq) vdb(tis)
+quit
+.endc
+.end

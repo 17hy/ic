@@ -1,0 +1,13 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * cascaded ctle small-signal macro model
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: vin: has no value, DC 0 assumed
+
+No. of Data Rows : 953
+ngspice-46 done

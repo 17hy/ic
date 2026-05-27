@@ -1,0 +1,43 @@
+* S2D input termination power-bounce cancellation macro model
+* Based on Fig. 7/Fig. 8 mechanism from Luo et al. JSSC 2025.
+* This is not a foundry transistor reproduction. It is a first-order ngspice
+* model of the termination current and PBC reverse-current cancellation.
+
+.options method=gear reltol=1e-6 abstol=1e-12 vntol=1e-8
+.param vcc=1.2
+.param vcm=0.6
+.param vinamp=0.15
+.param fin=2e9
+.param rterm=50
+.param rout=0.833333333
+.param gm_pbc={0.855/rterm}
+
+Videal vcc 0 {vcc}
+Vin in 0 SIN({vcm} {vinamp} {fin})
+
+* Baseline: finite LDO output impedance plus dc-coupled 50 ohm termination.
+Rout0 vcc vdd_nopbc {rout}
+Rterm0 vdd_nopbc in {rterm}
+
+* Proposed PBC path. The sensed input component is low-pass limited to ~10 GHz.
+* gm_pbc is an effective cancellation transconductance; ideal cancellation is
+* 1/rterm, while parasitics, Rs isolation, and finite bandwidth leave residue.
+Rout1 vcc vdd_pbc {rout}
+Rterm1 vdd_pbc in {rterm}
+Berr err 0 V={V(in)-vcm}
+Rlp err sense 1
+Clp sense 0 15.915p
+Bpbc vdd_pbc 0 I={gm_pbc*V(sense)}
+
+.tran 0.2p 5n 1n 0.2p
+
+.control
+run
+meas tran nopbc_pp PP v(vdd_nopbc) from=1n to=5n
+meas tran pbc_pp PP v(vdd_pbc) from=1n to=5n
+let suppression_pct = (nopbc_pp - pbc_pp)/nopbc_pp*100
+print nopbc_pp pbc_pp suppression_pct
+wrdata s2d_pbc_transient.csv time v(in) v(vdd_nopbc) v(vdd_pbc) v(sense)
+quit
+.endc
+.end

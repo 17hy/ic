@@ -1,0 +1,620 @@
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+IEEE JOURNAL OF SOLID-STATE CIRCUITS                                                                                                                                   1
+
+
+
+
+  A 4 × 224 Gb/s Single-Ended PAM-4 Transceiver
+  Front-End With Noise Suppression Technique and
+   Cascaded Equalizers in 130-nm SiGe BiCMOS
+Xiongshi Luo , Graduate Student Member, IEEE, Xuewei You, Zhenghao Li , Graduate Student Member, IEEE,
+    Hongzhi Wu , Member, IEEE, Yangyi Zhang , Student Member, IEEE, Fuzhan Chen , Member, IEEE,
+    Xuxu Cheng , Graduate Student Member, IEEE, Wentao Zhou, and Quan Pan , Senior Member, IEEE
+
+
+
+   Abstract—A dc-coupled analog single-ended (SE) transceiver
+(TRX) front-end supporting 224 Gb/s/lane is presented. It
+features SE-to-differential (S2D) and differential-to-SE (D2S)
+conversion, power-efficient broadband analog equalization, and
+noise suppression. Both the transmitter and receiver front-ends
+adopt pseudodifferential structures with dual-loop regulators to
+achieve a high power supply rejection ratio (PSRR). A power
+bounce canceller (PBC) is proposed for the S2D to reduce the
+power bounce noise by 76% and improve the eye width (EW)
+by 12%. Moreover, cascaded continuous-time linear equalizers
+(CTLEs) with emitter degradation, distributed-peaking tech-
+nique, and a feedforward low-pass branch are employed to enable
+low-/medium-/high-frequency equalization, supporting up to
+29 dB loss compensation. Fabricated in 130-nm SiGe BiCMOS,
+the proposed SE TRX front-end demonstrates a data rate of
+224 Gb/s PAM-4 with an energy efficiency of 2.08 pJ/b and an
+FoM of 0.07 pJ/b/dB. To the best of the author’s knowledge, this                      Fig. 1. (a) Conventional LR link and (b) proposed LR link based on SR
+work is the first SE TRX front-end operating at 224 Gb/s PAM-4.                       SerDes + SE TRX front end.
+
+   Index Terms—Analog linear driver, differential-to-single-ended
+(D2S), direct-current (dc)-coupled, four-level amplitude modula-
+tion (PAM-4), heavy loss, long reach (LR), noise suppression,                         and so on. Recently, the OIF-FD-CEI group [4] has been
+SE-to-differential (S2D), SiGe BiCMOS, single-ended (SE) links,                       discussing the 224 Gb/s signaling schemes for LR links. The
+transceiver (TRX) front end.                                                          FEC-DSP-based differential interface system [Fig. 1(a)] is
+                                                                                      robust and the most commonly used in data centers. Recently,
+                       I. I NTRODUCTION                                               emerging linear drive links offer advantages in power savings
+                                                                                      and reduced latency while maintaining similar performance
+W       ITH the exponential growth due to AI-accelerator
+        system applications [1], [2], wireline transceivers
+(TRXs) demand a high data rate of 224 Gb/s/lane to support
+                                                                                      with retimer-based links, making it particularly favored by
+                                                                                      data centers and AI/ML applications [5]. A promising linear-
+800GbE/1.6TbE [3], [4]. Long-reach (LR) wireline communi-                             driver-based solution for heavy-loss electrical cable links is
+cation scenarios, such as chassis-to-chassis and rack-to-rack                         shown in Fig. 1(b). It consists of a low-power extra-short
+interconnects with copper traces and cables, are with the                             reach (XSR)/very-short reach (VSR) SerDes and a single-
+most attentions. Multisection channels in this LR scenario                            ended (SE) TRX front-end. Compared to FEC-DSP-based LR
+make it challenging to achieve 224 Gb/s/lane with heavy                               scheme, this scheme is more cost-efficient and supports for
+insertion loss (IL), P/N skew, impedance discontinuity issues,                        high density, high equalization efficiency, and low latency.
+                                                                                      The SE scheme effectively mitigates intrapair skew issues in
+   Received 6 August 2025; revised 1 November 2025; accepted 10 December              LR transmission [6]. In addition, it doubles the bandwidth
+2025. This article was approved by Associate Editor Sam Palermo. This
+work was supported in part by the National Key Research and Develop-
+                                                                                      density by sending one SE signal per wire. Leveraging area-
+ment Program under Grant 2024YFB2807602, in part by the Science and                   and pin-efficient SR SerDes [7], [8], this scheme enables a
+Technology Plan of Shenzhen under Grant KJZD20240903100208012 and                     complete link implementation with higher bandwidth density
+Grant KJZD20231023100159002, and in part by the Southern University of                than conventional LR SerDes. This structural advantage could
+Science and Technology (SUSTech) High-Level Special Funds under Grant
+G03034K007. (Corresponding author: Quan Pan.)                                         facilitate comprehensive high-density integration across the
+   The authors are with the School of Microelectronics, Southern Uni-                 entire links, while maintaining differential signaling capabili-
+versity of Science and Technology, Shenzhen 518055, China (e-mail:                    ties inherent in SR SerDes implementations [9]. Notably, SE
+panq@sustech.edu.cn).                                                                 LR links encounter the issue of reference noise. Therefore, it
+   Color versions of one or more figures in this article are available at
+https://doi.org/10.1109/JSSC.2025.3644437.                                            is recommended to use a dedicated reference lane to carry the
+   Digital Object Identifier 10.1109/JSSC.2025.3644437                                signal reference in practice.
+             0018-9200 © 2025 IEEE. All rights reserved, including rights for text and data mining, and training of artificial intelligence and
+                       similar technologies. Personal use is permitted, but republication/redistribution requires IEEE permission.
+                                     See https://www.ieee.org/publications/rights/index.html for more information.
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                   This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+2                                                                                                                         IEEE JOURNAL OF SOLID-STATE CIRCUITS
+
+
+
+
+Fig. 2. Proposed 4-lane SE analog TRX front end.
+
+
+
+   Previous SE designs have demonstrated excellent energy
+and pin efficiencies, but their maximum data rate is limited
+to 112 Gb/s/wire in SR applications [10], [11], [12], [13],
+[14], [15], [16]. Most SE links employ direct-current (dc)
+coupling for high-density wiring [10], [11], [12], [13], [14],
+[15]. When the data rate target goes to 224 Gb/s, several
+critical challenges are to be addressed for dc-coupled SE
+signaling, including high channel loss, inherent low-power
+supply rejection ratio (PSRR) for SE links, discrepancy in dc
+operating points between transmitter (TX) output and receiver                        Fig. 3. Simulated THD at 1 GHz versus equalization of (a) TX front end
+(RX) input, and SE-to-differential (S2D) mismatch. In this                           and (b) RX frontend.
+work, to resolve the aforementioned issues, SiGe BiCMOS,
+featuring superior fT , high transconductance gain, and low-                         distributed-peaking scheme, provide superior equalization
+noise characteristics [17], [18], is chosen as the process of the                    capability beyond Nyquist frequency. Furthermore, a high-
+SE TRX front-end design. In addition, cascaded equalizers                            linearity source-degeneration VGA is used to adjust the swing
+with distributed peaking characteristics are designed to pro-                        for different equalization settings. Besides, regulators with
+vide superior compensatory capability. Moreover, a dual-loop                         high PSRR are employed in both the D2S driver and S2D
+regulator and a power bounce canceller (PBC) are proposed                            converter to suppress power supply noise which distorts SE
+for supply voltage noise suppression and power bounce noise                          signals. Notably, in both the TX inputs and RX outputs, 90 Ω
+cancellation. Furthermore, low-capacitance biasing (LCB) and                         rather than 100 Ω differential termination is used in favor
+asymmetric inductors are employed in the S2D converter to                            of better IL and return loss [4]. Furthermore, both TX and
+optimize the gain and group delay mismatch.                                          RX front ends employ pseudodifferential structures to leverage
+   This article, as an extension of [19], presents the design of                     their high common-mode rejection ratio (CMRR) capability.
+a 224 Gb/s four-level amplitude modulation (PAM-4) TRX                                  To eliminate the need for on-chip/off-chip dc blocks and
+front-end with noise-suppression S2D and cascaded analog                             enable high-density integration, the proposed D2S driver
+equalizers in 130-nm SiGe BiCMOS. The rest of this article is                        employs a direct dc-coupled interface to the S2D converter.
+organized as follows. Section II describes the proposed TRX                          In contrast, the TRX implementation in [16] utilizes ac-
+front-end architecture and circuit details of the RX and TX                          coupled interfaces with a ground-terminated resistor, achieving
+front-ends, respectively. Section III presents the experimental                      minimal bounce noise. However, dc-coupled architectures, as
+results, and Section IV summarizes this work.                                        inherent in SiGe-based designs, require termination to the
+                                                                                     power supply. This requirement introduces a challenge: the
+    II. A RCHITECTURE AND C IRCUIT I MPLEMENTATION                                   nonideal impedance of the power supply induces significant
+                                                                                     power supply bounce noise. To address this inherent limitation,
+A. Proposed SE TRX Architecture                                                      an RX-side power supply bounce suppression technique is
+   Fig. 2 depicts the proposed 4-lane dc-coupled SE analog                           implemented, effectively mitigating the noise.
+TRX front-end supporting 4×224 Gb/s. The TX front end fea-                              Fig. 3 illustrates the simulated total harmonic distortion
+tures an attenuator-based termination network, a pre-emphasis                        (THD) versus equalization of the TX and RX front ends while
+equalizer, and a differential-to-SE (D2S) driver. The RX front                       maintaining a received 200 mVpp signal at the input of the RX
+end features an S2D converter with a dc-coupled termination                          front end. The results demonstrate that to keep THD below
+network and PBC. Additionally, two cascaded broadband                                1%, the TX front end must compensate for less than 7.3 dB
+continuous-time linear equalizers (CTLEs), which achieve                             IL, while the RX front end must compensate for higher than
+low-/medium-/high-frequency (LF/MF/HF) equalizations with                            12.5 dB IL. This specific allocation of IL compensation,
+
+        Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                   This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+LUO et al.: 4 × 224 Gb/s SINGLE-ENDED PAM-4 TRANSCEIVER FRONT-END                                                                                                     3
+
+
+
+
+                                                                                     Fig. 5. Simulated supply waveform with 25 mV sawtooth wave noise, output
+                                                                                     noise of the TX and RX front ends.
+
+
+Fig. 4. (a) Concept and circuit implementation of dual-loop regulator,
+(b) simulated PSRs across three cases, and (c) Monte Carlo simulation.
+
+minimizing the TX front end’s contribution, is driven by the
+swing and linearity limitations inherent at the SE output. As
+a result, gain amplifiers are implemented in the RX front end
+rather than the TX front end.
+
+B. Proposed LDOs for S2D Converter and D2S Driver
+   To alleviate the power supply noise, low-dropout (LDO)                            Fig. 6. Simulated (a) supply power bounce noise with conventional and
+                                                                                     proposed LDO at 300 mVpp input and (b) on-chip interchannel crosstalk of
+regulators, as shown in Fig. 4(a), are implemented to supply                         the RX front end.
+both the S2D converter and D2S driver. In the evalua-
+tion board, a typical dc–dc converter is utilized to supply                          from 88 to 5 mVpp , achieving 94% suppression compared to
+the chips, and its voltage output exhibits a 25 mVpp saw-                            the conventional LDO with a single slow loop. However, for
+tooth wave noise at 1 MHz under the worst-case condition.                            other fully differential circuits, such as CTLEs, their inherent
+This imposes a significant challenge to the PSRR of the                              in-band PSR of below −60 dB eliminates the need for an
+on-chip LDOs. To address the issue, an LDO incorporating a                           LDO.
+two-stage cross-coupled error amplifier (XCEA) is presented.                            Moreover, the LDO in the pseudo-differential stage provides
+Moreover, a super-source-follower (SSF) circuit is integrated                        effective suppression of on-chip crosstalk noise since it isolates
+to implement a dual-loop architecture with a slow loop and                           the shared power distribution network from core circuits.
+a fast loop, delivering superior power supply rejection (PSR).                       Fig. 6(b) demonstrates that the implementation of LDO
+The dominant pole p1 is located in the output with a 200 pF                          effectively suppresses interchannel crosstalk across the entire
+capacitor, while the nondominant pole p2 is located at the                           operating frequency band, achieving a suppression of 51 dB
+gate of Mpass , where SSF provides low impedance to avoid                            at 56 GHz.
+p2 locating close to p1 . Fig. 4(b) and (c) shows the PSR
+curves across various cases: worst case (SS corner, 110 ◦ C,                         C. Proposed S2D Converter With PBC
+0.9VCC), typical case (TT corner, 27 ◦ C, VCC), and best case                           Fig. 7 illustrates the proposed S2D converter. Similar to
+(FF corner, −40 ◦ C, 1.1VCC), along with the Monte Carlo                             [20], the proposed PBC utilizes a transconductance stage to
+simulation results for PSR performance at 1 MHz. The LDO                             generate the reverse current IR , with its equivalent transcon-
+maintains a robust PSR of less than −40 dB at 1 MHz even                             ductance setting to 1/RTerm to effectively cancel the input
+in the worst case. The Monte Carlo simulation results show                           signal transient current IS . To relieve the bandwidth degra-
+that the LDO achieves a mean of −43.9 dB with a standard                             dation caused by the parasitics of PBC at the S2D input
+deviation of 0.72 dB in the typical case, enabling its use in                        port, the resistor Rs is inserted to isolate the PBC from the
+high-speed applications. With the 25 mVpp 1 MHz sawtooth-                            S2D circuit. This PBC is primarily designed to generate a
+wave supply noise, the TX and RX front ends only indicate 0.2                        compensating current from dc to 10 GHz. Higher-frequency
+and 0.02 mVpp output noises, respectively, as shown in Fig. 5.                       transient current beyond 10 GHz will be absorbed by the
+Besides, the dual-loop LDO reduces its output impedance by                           bypass capacitors of the LDO, which provides low impedance
+enhancing its current tracking capability with the fast loop,                        at high frequency. Fig. 8 demonstrates that enabling the
+thereby mitigating the power bounce effect. Fig. 6(a) shows                          proposed PBC reduces the maximum power supply impedance
+that when a 300 mVpp input signal is applied to the RX front                         from 3.8 to 0.3 Ω. Therefore, the power bounce noise is sup-
+end, the proposed dual-loop LDO reduces power supply noise                           pressed from 5 to 1.2 mV, corresponding to a 76% suppression
+
+        Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+4                                                                                                                          IEEE JOURNAL OF SOLID-STATE CIRCUITS
+
+
+
+
+Fig. 7. Circuit implementation of the S2D converter.
+
+
+
+
+                                                                                      Fig. 9. (a) Simulated parasitic capacitance of current sources and designed
+                                                                                      asymmetric inductors (b) gain and group delay mismatch of S2D converter;
+                                                                                      Monte Carlo simulation of (c) gain mismatch, and (d) GD mismatch.
+
+
+
+
+Fig. 8. (a) Simulated equivalent impedance of power supply and (b) supply
+power bounce noise with and without the proposed PBC.
+
+
+ratio. As a pseudodifferential circuit, the PBC necessitates a
+reference voltage, which is usually derived from a low-pass
+                                                                                      Fig. 10. Simulated S2D output 224 Gb/s eye diagrams with 200 mV input
+filter (LPF) [20]. However, the base current flowing through                          dc offset when (a) DCOC is disabled and (b) DCOC is enabled.
+the 100 kΩ resistor of the LPF induces a 1.4 V voltage
+drop, resulting in the unavailability of the reference voltage.                       D. Proposed Broadband Cascaded CTLEs With
+Therefore, a CMOS-based unity-gain operational amplifier                              Distributed-Peaking Techniques
+(UGOP) buffer is inserted to isolate the LPF from the base
+and generate a current reference voltage for the PBC circuit.                            Common-emitter (CE)-based CTLEs [9] show limitations in
+Besides, by utilizing a replica 50 ΩRTerm , this S2D converter                        attaining the required 56 GHz peaking frequency for 224 Gb/s
+can achieve a superior PSR close to a fully differential                              PAM-4. In contrast, cascode and emitter-follower (EF) con-
+topology.                                                                             figured CTLEs have gained increasing adoption in exceeding
+    To mitigate the mismatch issues in the S2D attributed to                          100 Gb/s designs in recent years [18], [21], [22], benefiting
+tail current source parasitics [16], an LCB and a pair of                             from their reduced Miller effect, low-capacitance EF input
+asymmetric inductors are introduced. Fig. 9(a) shows that                             characteristics, and inductive EF output impedance. To further
+the parasitic capacitance of the LCB current source is 30 fF                          enhance the peaking frequency and boosting gain, series
+less than that of the conventional CMOS current source.                               and shunt peaking techniques can be employed. However,
+Besides, the asymmetric inductors are designed to be 50 and                           high-frequency SiGe-based designs are highly susceptible to
+75 pH to neutralize the asymmetric parasitics of the S2D.                             resonance issues caused by the base parasitics. Prior studies
+Fig. 9(b) demonstrates that after applying LCB, group delay                           have investigated the impact of base/gate parasitic inductance
+mismatch and gain mismatch are reduced by 0.3 ps and                                  of the cascode device on stability issues in broadband ampli-
+0.6 dB, respectively. When combining LCB with asymmetric                              fier designs [23], [24]. This article further investigates the
+inductors, further reductions of 0.1 ps in group delay mis-                           cascaded CTLEs design with distributed-peaking techniques
+match and 0.2 dB in gain mismatch are achieved. The Monte                             (Fig. 11), specifically exploring how to strategically select
+Carlo simulation results in Fig. 9(c) and (d) demonstrate the                         inductor placement and optimize inductance values concerning
+strong robustness of the proposed S2D circuit against gain                            critical parameters: peaking frequency, gain boost, group delay
+mismatch, with a standard deviation of 34 mdB, and against                            variation (GDV), and stability factor across 0–150 GHz. The
+GD mismatch, with a standard deviation of 0.49 fs.                                    analysis encompasses shunt peaking inductor L1 and series
+    To avoid eye skew and linearity compression issues caused                         peaking inductors L2–L4, as shown in Fig. 12. The following
+by dc offset, a dc-offset cancellation (DCOC) loop is imple-                          observations can be made.
+mented. As shown in Fig. 10, when the input signal includes an                           1) When only L1 is adopted, due to its shunt peaking
+initial 200 mV dc offset from VRef , the DCOC automatically                                  characteristics, it exhibits robust stability with a stability
+adjusts VRef to eliminate eye skew and improves the ratio-of-                                factor |∆| less than 0.4 across 0–500 pH. It achieves
+level mismatch (RLM) from 0.75 to 0.98.                                                      a peaking frequency up to 70 GHz. However, both the
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+LUO et al.: 4 × 224 Gb/s SINGLE-ENDED PAM-4 TRANSCEIVER FRONT-END                                                                                                      5
+
+
+
+
+                                                                                      Fig. 12. Simulated (a) peaking frequency, (b) maximum boost, (c) stability
+                                                                                      factor |∆|, and (d) GDV of cascaded CTLEs with peaking techniques.
+Fig. 11. Cascaded CTLEs with distributed-peaking techniques.
+
+
+
+      peaking frequency and gain boost are sensitive to induc-
+      tance variations. Notably, when the inductance exceeds
+      100 pH, the peaking frequency rapidly decreases with
+      the inductance value.
+  2) When only L2 is adopted, the simulated peaking
+      frequency and gain boost increase sharply with the
+      inductance value. When the inductance exceeds 100 pH,
+      a peaking frequency exceeding 70 GHz is achieved,
+      and when the inductance exceeds 150 pH, a gain boost
+      exceeding 30 dB is achieved, indicating that L2 exhibits
+      the highest peaking efficiency. However, the superior
+      peaking efficiency of L2 comes at the cost of severe
+      GDV and potential instability. Inductance must be kept
+      below 150 pH to maintain |∆| < 1 for robust stability
+      and avoid undesired boost and GDV.
+  3) When only L3 is adopted, the peaking frequency and
+      gain boost exhibit the lowest sensitivity to inductance.                        Fig. 13. Comprehensive characteristics with (a) L1, (b) L2, (c) L3, and
+      As the inductance varies from 0 to 500 pH, the gain                             (d) L4 .
+      boost variation is merely one-third of that observed
+                                                                                      are employed to enable collaborative peaking, thereby achiev-
+      in the L1-only and L4-only cases. Moreover, when
+                                                                                      ing superior peaking frequency, gain boost, GDV, and stability,
+      the inductance exceeds 500 pH, its stability factor
+                                                                                      as shown in Fig. 14(a)–(c). L1 and L3 provide gain boost
+      approaches the critical threshold of 1. Nevertheless, the
+                                                                                      below 65 GHz, while L2 and L4 further improve the peaking
+      GDV of this case is optimal.
+                                                                                      frequency and high-frequency gain boost. This distributed-
+  4) When only L4 is adopted, it demonstrates excellent
+                                                                                      peaking scheme ultimately extends the peaking frequency from
+      peaking frequency up to 70 GHz and a stability factor
+                                                                                      56 to 75 GHz. It elevates the maximum high-frequency gain
+      less than 0.9 across 0-to-500 pH. However, its gain boost
+                                                                                      boost from 15 to 25 dB, concurrently achieving a GDV of
+      exhibits a sensitivity to inductance variation as severe
+                                                                                      18 ps and a stability factor under 0.4. Moreover, the CTLE
+      as that of the L1-only case, and the GDV is worse
+                                                                                      with a feedforward branch enables relocation of the large-
+      compared to the L1-only and L3-only cases.
+                                                                                      area, noncritical high-RC LF branch away from the compact
+  The aforementioned comprehensive characteristics of the                             HF core, thereby reducing unwanted parasitics and coupling
+inductors are summarized and visually represented in Fig. 13.                         effects in the layout.
+The design objective of the cascaded CTLEs is to support com-
+pensation beyond the Nyquist frequency, which can further
+improve jitter and amplitude noise compared to compensation                           E. D2S Driver With SF Network
+at the Nyquist frequency [25]. In the proposed cascaded                                 To realize a D2S driver with a response approaching the
+CTLEs design, distributed routing inductors L1–L4 with                                Bessel response, shunt-feedback (SF) is employed to enhance
+<100 pH inductances, rather than a single large spiral inductor,                      bandwidth and improve in-band GDV, as shown in Fig. 15(a).
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+6                                                                                                                           IEEE JOURNAL OF SOLID-STATE CIRCUITS
+
+
+
+
+                                                                                       Fig. 15. (a) Circuit implementation of the D2S driver, and analyses and
+                                                                                       (b) driver with and without introduced SF.
+
+Fig. 14. Simulated (a) gain, (b) group delay response, and (c) stability factor
+|∆| with L1–L4 of cascaded CTLEs.
+
+In the D2S driver, the SF network comprises a resistor RF
+and a capacitor CF . Fig. 15(b) compares the transfer function
+and self-resonant frequency of the two-stage driver with and
+without the SF resistor RF . It demonstrates that this configu-
+ration introduces an additional zero of Gm1 (Gm2 RF − 1)/C1
+while exhibiting a ((RF + RL )/RF )1/2 times higher natural
+frequency. Employing SF network enables a 15% bandwidth
+extension (from 60 to 69 GHz) while simultaneously reducing                            Fig. 16. Simulated (a) gain and (b) group delay response.
+GDV by 56% (from 1.23 to 0.54 ps), as shown in Fig. 16.
+As a result, the D2S driver output eye diagram resembles
+a Bessel response with an improved ratio of eye height to
+Vpp (EH/Vpp ) and eye width (EW). As shown in Fig. 17, a
+30.8% improvement in the minimum EH/Vpp ratio (from 0.13
+to 0.17) and a 23.3% enhancement in minimum EW (from
+0.3 to 0.37 UI) are achieved. Besides, a replica loading is
+employed to support dc coupling to RX, ensuring that the
+current passing through each loading resistor equals 6 mA.
+To cope with self-loading and output pad parasitic, emitter
+degeneration and inductive peaking are also employed.
+                                                                                       Fig. 17. Simulated 224 Gb/s eye diagram of the D2S driver output eye
+                                                                                       diagrams (a) without SF network and (b) with SF network.
+               III. M EASUREMENT R ESULTS
+   The proposed TRX front end is fabricated using 130-nm                                  Fig. 19 illustrates the measurement setup. Gain response and
+SiGe BiCMOS technology. Fig. 18 shows the chip micropho-                               return loss are characterized using a 110 GHz vector network
+tographs and power breakdowns of the TX and RX front-ends.                             analyzer (Keysight N5247B and N5292A), while eye diagrams
+The core circuit area per lane of the TX and RX front-ends                             and bit error rate (BER) are characterized using a BER tester
+is 0.3 × 0.45 mm2 and 0.3 × 0.6 mm2 , respectively. The total                          (Keysight 8050A) and an oscilloscope (Keysight 1046A).
+power consumption of the TX and RX front-ends is 154 and                                  Fig. 20(a) and (b) demonstrates that the CTLE tuning range
+312 mW, respectively, corresponding to energy efficiencies of                          is 4–13 dB at 56 GHz while the dc gain varies by 6 dB in
+0.69 and 1.39 pJ/b.                                                                    the TX front-end, and the CTLE tuning range is 4–22 dB
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+LUO et al.: 4 × 224 Gb/s SINGLE-ENDED PAM-4 TRANSCEIVER FRONT-END                                                                                                      7
+
+
+
+
+                                                                                      Fig. 21. Measured 112 Gbaud NRZ of the RX front end (a) without and
+                                                                                      (b) with LF&MF equalization.
+
+
+Fig. 18. (a) Chip microphotographs and (b) power breakdowns.
+
+
+
+
+                                                                                      Fig. 22. (a) Measured BER of the RX front end with and without LF&MF
+                                                                                      equalization and (b) BER of the TRX front end with and without PBC at
+                                                                                      112 Gb/s NRZ.
+Fig. 19. (a) Time-domain and (b) frequency-domain measurement setup.
+
+
+
+
+                                                                                      Fig. 23. (a) Measured FEXT of the TX and RX front ends and
+Fig. 20. Measured gain response of (a) TX and (b) RX front-ends; measured             (b) simulated eye diagrams of the TX and RX front ends using measured
+return loss of (c) TX and (d) RX front-ends.                                          FEXT S-parameters.
+
+                                                                                         Figs. 21 and 22(a) compare the measured eye diagrams and
+at 56 GHz while the dc gain varies by 14 dB in the RX                                 BER of the RX front end without and with LF&MF equal-
+front end. Fig. 20(c) demonstrates that both the TX and RX                            ization. When LF&MF equalization is disabled, the 112 Gb/s
+front ends achieve in-band termination match with less than                           NRZ eye diagram is almost closed with a minimal BER of
+−10 dB return loss.                                                                   1e-9, while enabling LF&MF equalization yields an EW of
+   Fig. 20(d) shows the equalization capability of the TX and                         0.35 UI and a minimum BER of 1e-12. Fig. 22(b) demon-
+RX front ends, respectively. The total channel loss during the                        strates the BER measurement results of the full TRX link
+TX front end standalone measurement is −6 dB at 56 GHz.                               without and with PBC. When PBC is disabled, the TRX front
+The TX front end along with this loss can achieve a −3 dB                             end achieves 0.17 UI EW at BER = 1e-12 for 112 Gb/s
+bandwidth of 65 GHz. The total channel loss during the RX                             NRZ signaling. When PBC is enabled, the EW increases to
+front-end standalone measurement is −16 dB at 56 GHz. The                             0.19 UI at BER = 1e-12, yielding a 12% enhancement of
+RX front end, along with this loss, can achieve a −3 dB                               eye opening. Fig. 23(a) shows the measured far-end crosstalk
+bandwidth of 75 GHz.                                                                  (FEXT) performance. With a lane pitch of 700 µm, the
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+8                                                                                                                          IEEE JOURNAL OF SOLID-STATE CIRCUITS
+
+
+
+                                                                    TABLE I
+                                           P ERFORMANCE S UMMARY AND C OMPARISON W ITH P REVIOUS W ORKS
+
+
+
+
+Fig. 24. Measured S-parameters of (a) 16/22/29 dB channels and (b) full-link
+gain response of the TRX front end with the 16/22/29 dB channels.
+
+
+
+measured FEXT of adjacent lanes, which contain the crosstalk
+of deliberately added fan-out PCB traces, is less than −35 dB
+in both the TX and RX front ends. Simulations are conducted
+to evaluate the impact of crosstalk on time-domain perfor-
+mance. During simulations, measured FEXT S-parameters are                             Fig. 25. Measured (a) 112 Gb/s NRZ and (b) 224 Gb/s PAM-4 eye diagrams
+used to generate the aggressor signals, and the aggressor                             with 16/22/29 dB channels.
+signals are then added to the original eye diagram of the
+TX/RX front-end, as shown in Fig. 23(b). The simulation
+results show that with one and two aggressors, the EH of
+the TX front end is attenuated by 0% and 1%, respectively,                            openings of 112 Gb/s NRZ with 807, 670, and 990 fs rms
+while the EH of the RX front-end is attenuated by 0% and                              jitter, respectively. With the scope 8-tap FFE, the TRX front
+1%, respectively. It demonstrates a negligible impact of FEXT                         end also shows eye openings of 224 Gb/s PAM-4 with 0.83,
+on the eye diagrams. This superior FEXT performance is                                0.95, and 0.92 RLM, respectively. When compensating for a
+attributed to the implementation of the dual-loop LDOs.                               low channel loss of 16 dB, the degeneration resistor in the
+   In the full-link TRX front-end measurement setup, the SE                           cascaded equalizers must be set to a smaller value, resulting
+TX outputs are looped back to the SE RX inputs via lossy                              in limited linearity. This causes an asymmetry in the charge
+channels, while the cables for the differential input of the TX                       and discharge capabilities of the receiver’s equalizer, which
+front end and the differential output of the RX front end are                         manifests as asymmetric data jitter and compression in the
+de-embedded. Fig. 24 demonstrates the equalization capability                         upper and lower eye diagrams. When compensating for a high
+of the TRX front end under different channel conditions. The                          channel loss of 29 dB, which is beyond the compensation
+full-link TRX front end achieves bandwidths of 68/65/63 GHz,                          capability of the equalizers, the TRX front end’s bandwidth
+respectively, with 16/22/29 dB channels.                                              becomes significantly lower than 64 GHz, and the eye diagram
+   Fig. 25(a) and (b) shows the measured 112 Gbaud eye dia-                           tends to close. This necessitates the use of an oscilloscope for
+grams of the TRX front end under different channel conditions.                        equalization. Therefore, the suitable compensation range for
+With 16/22/29 dB channels, the TRX front end shows eye                                the TRX front end is 16–29 dB.
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                     This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+LUO et al.: 4 × 224 Gb/s SINGLE-ENDED PAM-4 TRANSCEIVER FRONT-END                                                                                                       9
+
+
+
+                                                                                       [6]  U. Kareti, D. Nozadze, D. Padilla, and Y. Tang. Intrapair Skew
+                                                                                            Considerations for 224Gbps/lane Electrical Signaling. Accessed:
+                                                                                            May 4, 2025. [Online]. Available: https://www.ieee802.org/3/dj/public/
+                                                                                            24 01/kareti 3dj 02 2401.pdf
+                                                                                       [7] C. F. Poon et al., “A 1.24-pJ/b 112-Gb/s (870 Gb/s/Mm) transceiver for
+                                                                                            in-package links in 7-nm FinFET,” IEEE J. Solid-State Circuits, vol. 57,
+                                                                                            no. 4, pp. 1199–1210, Apr. 2022.
+                                                                                       [8] G. Gangasani et al., “A 1.6Tb/s chiplet over XSR-MCM channels using
+                                                                                            113Gb/s PAM-4 transceiver with dynamic receiver-driven adaptation of
+                                                                                            TX-FFE and programmable roaming taps in 5 nm CMOS,” in IEEE
+                                                                                            Int. Solid-State Circuits Conf. (ISSCC) Dig. Tech. Papers, Feb. 2022,
+                                                                                            pp. 122–123.
+Fig. 26. Measured BER of (a) 112 Gb/s NRZ and (b) 224 Gb/s PAM-4 with                  [9] X. Luo et al., “A 112-Gb/s single-ended PAM-4 transceiver front-end
+16/22/29 dB channels.                                                                       for reach extension in long-reach link,” IEEE Trans. Circuits Syst. I,
+                                                                                            Regular Papers, vol. 72, no. 12, pp. 7681–7692, Dec. 2025.
+                                                                                       [10] L. Zhong et al., “A 2x50 Gb/s single-ended MIMO PAM-4 crosstalk
+                                                                                            cancellation and signal reutilization receiver in 28 nm CMOS,” in
+   Fig. 26 shows the measured BER of the TRX front end.                                     Proc. IEEE 48th Eur. Solid State Circuits Conf. (ESSCIRC), Sep. 2022,
+The measured 112 Gb/s NRZ eye diagrams yield EWs of                                         pp. 501–504.
+0.14/0.17/0.11 UI at BER = 1e-12 with 16/22/29 dB channels.                            [11] B. Kim et al., “22.3 A 42Gb/s single-ended hybrid-DFE PAM-3 receiver
+The measured 224 Gb/s PAM-4 eye diagrams yield EWs of                                       for GDDR7 memory interfaces,” in IEEE Int. Solid-State Circuits
+                                                                                            Conf. (ISSCC) Dig. Tech. Papers, San Francisco, CA, USA, Feb. 2025,
+0.08/0.10/0.05 UI at BER = 1e-6 with 16/22/29 dB channels.                                  pp. 1–3.
+   Table I summarizes the performance of this work and                                 [12] D. Yoon, J. He, K.-H. Baek, Y. Choi, J. Choi, and T. T.-H. Kim,
+compares it with other state-of-the-art SE links. Compared                                  “A 10.5 Gbps 0.55 pJ/bit PAM-3 transceiver using a self-driven dual
+                                                                                            TIA receiver and floating impedance matching for parallel on-chip
+to SE designs also in SiGe [21], [26], [27], [28], this work                                transmission lines,” in Proc. IEEE Asian Solid-State Circuits Conf. (A-
+has achieved better energy efficiency and FoM (pJ/bit/dB)                                   SSCC), Nov. 2024, pp. 1–3.
+via topology optimization and distributed-peaking scheme.                              [13] K. McCollough, S. D. Huss, J. Vandersand, R. Smith, C. Moscone,
+Compared to previous CMOS work [15], [29], [30], this work                                  and Q. O. Farooq, “11.3 A 480Gb/s/mm 1.7pJ/b short-reach wireline
+                                                                                            transceiver using single-ended NRZ for Die-to-Die applications,” in
+has achieved much higher data rates via high equalization                                   IEEE Int. Solid-State Circuits Conf. (ISSCC) Dig. Tech. Papers, Feb.
+capability with cascaded equalizers. To the author’s knowl-                                 2021, pp. 1–3.
+edge, this TRX front end achieves the highest data rate of                             [14] A. Manian, A. Rane, Y. Koh, H. K. Nat, and M. Lu, “A simultaneous
+the SE PAM-4 signal in both CMOS and SiGe BiCMOS                                            bidirectional single-ended coaxial link with 24-Gb/s forward and 312.5-
+                                                                                            Mb/s back channels,” IEEE J. Solid-State Circuits, vol. 56, no. 3,
+technologies.                                                                               pp. 972–987, Mar. 2021.
+                                                                                       [15] Y. Nishi et al., “A 0.297-pJ/Bit 50.4-Gb/s/Wire inverter-based short-
+                                                                                            reach simultaneous bi-directional transceiver for Die-to-Die interface
+                            IV. C ONCLUSION                                                 in 5-nm CMOS,” IEEE J. Solid-State Circuits, vol. 58, no. 4,
+                                                                                            pp. 1062–1073, Apr. 2023.
+   This article presents a 4 × 224 Gb/s dc-coupled SE                                  [16] X. Luo et al., “A 112-Gb/s single-ended PAM-4 transceiver front-end
+PAM-4 TRX front end in 130-nm SiGe BiCMOS. The                                              for reach extension in long-reach link,” in IEEE 48th Eur. Solid-State
+proposed PBC in S2D suppresses the power bounce noise                                       Circuits Conf. (ESSCIRC), Jun. 2022, pp. 497–500.
+by 76%. The proposed cascaded CTLEs with distributed                                   [17] S. Niu et al., “A linear modulator driver with over 70-GHz band-
+                                                                                            width 21.8-dB gain and 3.4-vppd output swing for beyond 120-GBd
+peaking provide compensation beyond the Nyquist frequency.                                  optical links,” IEEE Trans. Microw. Theory Techn., vol. 72, no. 7,
+Measurement results further validate that the proposed PBC                                  pp. 4080–4091, Jul. 2024.
+improves the horizontal eye opening by 12% at a BER of                                 [18] I. Garcia Lopez, A. Awny, P. Rito, M. Ko, A. C. Ulusoy, and
+1e-12, and the RX front end demonstrates a peaking frequency                                D. √Kissinger, “100 Gb/s differential linear TIAs with less than 10
+                                                                                            pA/ Hz in 130-nm SiGe: C BiCMOS,” IEEE J. Solid-State Circuits,
+up to 75 GHz with a maximum boost of 22 dB at 56 GHz.                                       vol. 53, no. 2, pp. 458–469, Feb. 2018.
+The TRX front end successfully combats an SE channel loss                              [19] X. Luo et al., “7.5 A 224Gb/s/wire single-ended PAM-4 transceiver
+of up to 29 dB, achieving an energy efficiency of 2.08 pJ/bit                               front-end with 29dB equalization for 800GbE/1.6TbE,” in IEEE Int.
+                                                                                            Solid-State Circuits Conf. (ISSCC) Dig. Tech. Papers, San Francisco,
+and an FoM of 0.07 pJ/b/dB. This work verifies the viability                                CA, USA, Feb. 2024, pp. 132–134.
+of designing an SE 200 + Gb/s/lane TRX front end for heavy-                            [20] T. Takemoto et al., “A 25-Gb/s 2.2-W 65-nm CMOS optical transceiver
+loss links.                                                                                 using a power-supply-variation-tolerant analog front end and data-format
+                                                                                            conversion,” IEEE J. Solid-State Circuits, vol. 49, no. 2, pp. 471–485,
+                                                                                            Feb. 2014.
+                               R EFERENCES                                             [21] S. Ma et al., “Signal integrity augmentation techniques for the
+                                                                                            design of 64-Gbaud coherent transimpedance amplifier in 90-nm SiGe
+[1]   Y. Wei et al., “9.3 NVLink-C2C: A coherent off-package chip-to-                       BiCMOS,” IEEE Trans. Circuits Syst. I, Reg. Papers, vol. 71, no. 11,
+      chip interconnect with 40Gbps/pin single-ended signaling,” in IEEE                    pp. 5221–5234, Nov. 2024.
+      Int. Solid-State Circuits Conf. (ISSCC) Dig. Tech. Papers, Feb. 2023,            [22] G. Dziallas, A. Fatemi, A. Malignaggi, and G. Kahmen, “A 97-GHz
+      pp. 160–162.                                                                          66-dBO SiGe BiCMOS low-noise transimpedance amplifier for opti-
+[2]   E. Talpes, D. Williams, and D. D. Sarma, “DOJO: The microarchitecture                 cal receivers,” IEEE Microw. Wireless Compon. Lett., vol. 31, no. 12,
+      of Tesla’s exa-scale computer,” in Proc. IEEE Hot Chips 34 Symp.                      pp. 1295–1298, Dec. 2021.
+      (HCS), Aug. 2022, pp. 1–28.                                                      [23] P. Rito et al., “A DC-90-GHz 4-V pp modulator driver in a 0.13-µm
+[3]   IEEE 802.3 Beyond 400 Gb/s Ethernet Study Group Meeting. Accessed:                    SiGe: C BiCMOS process,” IEEE Trans. Microw. Theory Techn., vol. 65,
+      May 4, 2025. [Online]. Available: https://grouper.ieee.org/groups/802/3/              no. 12, pp. 5192–5202, Dec. 2017.
+      B400G/public/                                                                    [24] A. Arbabian and A. M. Niknejad, “Design of a CMOS tapered cascaded
+[4]   Next Generation CEI-224G Framework. [Online]. Available: http://                      multistage distributed amplifier,” IEEE Trans. Microw. Theory Techn.,
+      www.oiforum.com/wp-content/uploads/OIF-FD-CEI-224G-01.0.pdf                           vol. 57, no. 4, pp. 938–947, Apr. 2009.
+[5]   E. S. Chou et al., “100G and 200G per lane linear drive optics for data          [25] X. Zheng et al., “A 50–112-Gb/s PAM-4 transmitter with a fractional-
+      center applications,” in Proc. Opt. Fiber Commun. Conf. (OFC), San                    spaced FFE in 65-nm CMOS,” IEEE J. Solid-State Circuits, vol. 55,
+      Diego, CA, USA, 2024, p. W4H.3.                                                       no. 7, pp. 1864–1876, Jul. 2020.
+
+          Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+                    This article has been accepted for inclusion in a future issue of this journal. Content is final as presented, with the exception of pagination.
+
+
+10                                                                                                                         IEEE JOURNAL OF SOLID-STATE CIRCUITS
+
+
+
+[26] J. He et al., “Design of a PAM-4 VCSEL-based transceiver front-end for                                    Yangyi Zhang (Student Member, IEEE) received
+     beyond-400G short-reach optical interconnects,” IEEE Trans. Circuits                                      the B.S. degree in electronic and informa-
+     Syst. I, Reg. Papers, vol. 69, no. 11, pp. 4345–4357, Nov. 2022.                                          tion engineering from Jinan University (JNU),
+[27] A. Manian, A. Rane, and Y. Koh, “A simultaneous bidirectional                                             Guangzhou, China, in 2022, and the M.S. degree
+     single-ended coaxial link with 24-Gb/s forward and 312.5-Mb/s back                                        in electronic science and technology from the
+     channels,” in Proc. IEEE 44th Eur. Solid-State Circuits Conf. (ESS-                                       Southern University of Science and Technology
+     CIRC), Sep. 2018, pp. 178–181.                                                                            (SUSTech), Shenzhen, China, in 2025. He is
+[28] K. Maeda, T. Norimatsu, K. Kogo, N. Kohmu, K. Nishimura, and                                              currently pursuing the Ph.D. degree with the
+     I. Fukasaku, “An active copper-cable supporting 56-Gbit/s PAM4 and                                        IDLab Design Group, Department of Informa-
+     28-Gbit/s NRZ with continuous time linear equalizer IC for to-meters                                      tion Technology, Ghent University—IMEC, Ghent,
+     reach interconnection,” in Proc. IEEE Symp. VLSI Circuits, Honolulu,                                      Belgium.
+     HI, USA, Jun. 2018, pp. 49–50.                                                      His research interests include high-speed wireline receiver and optical
+[29] S. Krishnamurthy et al., “A 0.9pJ/b 108Gb/s PAM-4 VCSEL-based                    receiver.
+     direct-drive optical engine,” in IEEE Int. Solid-State Circuits Conf.
+     (ISSCC) Dig. Tech. Papers, San Francisco, CA, USA, Feb. 2025,
+     pp. 592–594.                        √
+[30] K. Lakshmikumar et al., “A 7 pA/ Hz asymmetric differential TIA for                                      Fuzhan Chen (Member, IEEE) received the B.S.
+     100Gb/s PAM-4 links with –14dBm optical sensitivity in 16nm CMOS,”                                       degree in microelectronics from Hefei University of
+     in IEEE Int. Solid-State Circuits Conf. (ISSCC) Dig. Tech. Papers, San                                   Technology, Hefei, Anhui, China, in 2017, the M.S.
+     Francisco, CA, USA, Feb. 2023, pp. 206–208.                                                              degree in microelectronics from the University of
+                                                                                                              Chinese Academy of Sciences, Beijing, China, in
+                                                                                                              2020, and the Ph.D. degree in electronic and com-
+                                                                                                              puter engineering from The Hong Kong University
+                         Xiongshi Luo (Graduate Student Member, IEEE)                                         of Science and Technology, Hong Kong, China, in
+                         received the B.S. and Ph.D. degrees in microelec-                                    2025.
+                         tronics science and engineering from the Southern                                       He is currently a Post-Doctoral Fellow with The
+                         University of Science and Technology, Shenzhen,                                      Hong Kong University of Science and Technology.
+                         China, in 2019 and 2025, respectively.                       His research focuses on transceiver integrated circuit design for high-speed
+                            His research interests include high-speed serial          optical and wireline communications.
+                         links and optical interconnects.
+
+
+                                                                                                                  Xuxu Cheng (Graduate Student Member, IEEE)
+                                                                                                                  received the B.S. degree from Wuhan University,
+                                                                                                                  Wuhan, China, in 2018, and the M.S. degree in
+                                                                                                                  electronic and communication engineering from
+                         Xuewei You received the B.S. degree in electronics                                       Shanghai Jiao Tong University, Shanghai, China, in
+                         science and technology from Harbin Institute of                                          2021. He is currently pursuing the Ph.D. degree with
+                         Technology, Weihai, China, in 2019, and the M.S.                                         the Southern University of Science and Technology,
+                         degree in microelectronics science and engineering                                       Shenzhen, China.
+                         from the Southern University of Science and Tech-                                           His current research interests focus on high-speed
+                                                                                                                  transceiver circuit design.
+                         nology, Shenzhen, China, in 2022.
+                            Since 2022, he has been an Analog Design Engi-
+                         neer with PhotonIC Technologies, Shenzhen.
+
+                                                                                                                  Wentao Zhou received the B.S. and M.S. degrees
+                                                                                                                  in microelectronics science and engineering from
+                                                                                                                  the Southern University of Science and Technology
+                                                                                                                  (SUSTech), Shenzhen, China, in 2021 and 2024,
+                                                                                                                  respectively.
+                                                                                                                     His research interests include high-speed serial
+                         Zhenghao Li (Graduate Student Member, IEEE)                                              links and optical interconnects.
+                         received the B.S. and Ph.D. degrees in microelec-
+                         tronics science and engineering from the Southern
+                         University of Science and Technology, Shenzhen,
+                         China, in 2020 and 2025, respectively.
+                            His research interests include high-speed optical
+                         receiver front-end circuits and clock and data recov-                                   Quan Pan (Senior Member, IEEE) received the
+                         ery circuits design.                                                                    B.S. degree in electrical engineering (EE) from the
+                                                                                                                 University of Science and Technology of China
+                                                                                                                 (USTC), Hefei, China, in 2005, and the Ph.D. degree
+                                                                                                                 in electronics and computer engineering (ECE) from
+                                                                                                                 The Hong Kong University of Science and Technol-
+                                                                                                                 ogy (HKUST), Hong Kong, in 2014.
+                                                                                                                    From 2014 to 2018, he was a Senior Staff Engi-
+                         Hongzhi Wu (Member, IEEE) received the B.S.                                             neer at one Silicon Valley start-up company, working
+                         degree in communication engineering from the Uni-                                       on 400-GbE high-speed SerDes. He joined the
+                         versity of Electronic Science and Technology of                                         School of Microelectronics, Southern University of
+                                                                                      Science and Technology (SUSTech), Shenzhen, China, in 2018, as an Assistant
+                         China (UESTC), Chengdu, China, in 2020, and the
+                         Ph.D. degree from the Southern University of Sci-            Professor, where he is currently a Full Professor with early promotions. He
+                         ence and Technology (SUSTech), Shenzhen, China,              has contributed more than 90 peer-reviewed articles. His research interests
+                         in 2025.                                                     include high-speed optical and wireline circuit design.
+                            His research interests include high-speed wireline           Dr. Pan received the 2017 Outstanding Young Author Award of IEEE
+                         transceivers and low-power equalizers.                       Circuits and System Society. He serves as an Active Reviewer for many
+                                                                                      international journals, including JSSC, TCAS, TVLSI, JLT, PTL, and JoS.
+
+
+         Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:23:12 UTC from IEEE Xplore. Restrictions apply.
+

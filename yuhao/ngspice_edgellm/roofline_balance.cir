@@ -1,0 +1,45 @@
+* EdgeLLM roofline / HBM balance behavioral model
+* Voltages represent bits/cycle or normalized ratios.
+* Backlog capacitors integrate demand-service deficits over normalized time.
+
+.param hbm_bw=16384
+.param ffn_par=4096
+.param ffn_bits=4
+.param mha_par=1024
+.param mha_bits=16
+.param ddr_ratio=0.25
+.param ideal_us=29.25
+.param real_us=38.5
+
+Bffn ffn_demand 0 V={ffn_par*ffn_bits}
+Bmha mha_demand 0 V={mha_par*mha_bits}
+Bhbm hbm_service 0 V={hbm_bw}
+Bddr ddr_service 0 V={hbm_bw*ddr_ratio}
+Bffnratio ffn_ratio 0 V={(ffn_par*ffn_bits)/hbm_bw}
+Bmharatio mha_ratio 0 V={(mha_par*mha_bits)/hbm_bw}
+Butil hbm_util_pct 0 V={ideal_us/real_us*100}
+
+Cedge edge_backlog 0 1 IC=0
+Redge edge_backlog 0 1e12
+Biedge 0 edge_backlog I={ffn_par*ffn_bits-hbm_bw}
+
+Cddr ddr_backlog 0 1 IC=0
+Rddr ddr_backlog 0 1e12
+Biddr 0 ddr_backlog I={ffn_par*ffn_bits-hbm_bw*ddr_ratio}
+
+.tran 1u 1m uic
+.control
+run
+meas tran ffn_demand_bits find v(ffn_demand) at=1u
+meas tran mha_demand_bits find v(mha_demand) at=1u
+meas tran hbm_service_bits find v(hbm_service) at=1u
+meas tran ddr_service_bits find v(ddr_service) at=1u
+meas tran ffn_ratio_val find v(ffn_ratio) at=1u
+meas tran mha_ratio_val find v(mha_ratio) at=1u
+meas tran hbm_util_percent find v(hbm_util_pct) at=1u
+meas tran edge_backlog_end find v(edge_backlog) at=1m
+meas tran ddr_backlog_end find v(ddr_backlog) at=1m
+wrdata roofline_backlog.csv time v(edge_backlog) v(ddr_backlog)
+quit
+.endc
+.end
