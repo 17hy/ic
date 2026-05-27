@@ -1,2 +1,3 @@
 # Ignore specific PDF
 模拟CMOS集成电路设计 （美）毕查德·拉扎维（Behzad Razavi）著-AI.pdf
+*.pdf
