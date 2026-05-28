@@ -172,3 +172,23 @@ ngspice -b 06_loop_gain_ac.cir
 
 建议你在掌握这些宏模型后，再用具体 CMOS PDK 把误差放大器和 PMOS pass 管换成晶体管级电路。
 
+## 9. 论文中的双环 LDO：S2D Converter 和 D2S Driver
+
+`paper_dual_loop_ldo_zh.md` 针对本目录上级 PDF 论文第 II-B 节，新增了一个论文启发的双环 LDO 复现。
+
+这组练习的重点是：
+
+- 普通慢环 LDO 难以同时处理低频供电纹波和高速负载扰动。
+- 论文使用 XCEA 作为慢环，保证低频 PSR 和输出精度。
+- 论文使用 SSF 作为快环，降低 pass 管栅极阻抗和动态输出阻抗。
+- 输出端 `200 pF` 电容形成主极点，pass 管栅极极点要被推离主极点。
+
+运行：
+
+```powershell
+ngspice -b 07_paper_dual_loop_psr.cir
+ngspice -b 08_paper_sawtooth_noise.cir
+ngspice -b 09_paper_power_bounce.cir
+```
+
+这 3 个例子分别对应 PSR 曲线、25 mVpp/1 MHz 锯齿供电噪声、以及普通慢环和双环 LDO 的 power-bounce 对比。

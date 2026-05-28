@@ -1,0 +1,57 @@
+* transmission-gate latch transient simulation
+* Non-standard structure:
+* Q -> feedback TG -> Y -> feedback inverter -> X -> output inverter -> Q
+* D -> input inverter -> DBAR -> input TG -> X
+
+.include ../models/chapter7_cmos.inc
+
+.param VDD=2.5
+.param LMIN=0.25u
+.param WN=1u
+.param WP=2.75u
+
+Vdd vdd 0 {VDD}
+
+* clk: high from 0~4ns, low from 4~8ns, high again from 8~12ns
+Vclk  clk  0 PULSE({VDD} 0 4n 50p 50p 4n 8n)
+Vclkb clkb 0 PULSE(0 {VDD} 4n 50p 50p 4n 8n)
+
+* D changes during transparent and hold intervals
+* D rises at 2ns, falls at 5ns, rises again at 10ns
+Vin d 0 PULSE(0 {VDD} 2n 50p 50p 3n 8n)
+
+* input inverter: D -> DBAR
+Xinv_in d dbar vdd inv wnn={WN} wpp={WP} lch={LMIN}
+
+* input transmission gate: DBAR -> X
+* on when clk=1
+Xtg_in dbar x clk clkb vdd tg wnn={WN} wpp={WP} lch={LMIN}
+
+* output inverter: X -> Q
+Xinv_out x q vdd inv wnn={WN} wpp={WP} lch={LMIN}
+
+* feedback transmission gate: Q -> Y
+* on when clk=0
+Xtg_fb q y clkb clk vdd tg wnn={WN} wpp={WP} lch={LMIN}
+
+* feedback inverter: Y -> X
+Xinv_fb y x vdd inv wnn={WN} wpp={WP} lch={LMIN}
+
+* initial condition, helps convergence
+.ic v(x)=0 v(q)={VDD} v(y)=0
+
+.control
+set noaskquit
+set wr_vecnames
+set wr_singlescale
+
+tran 5p 20n
+
+plot v(d) v(clk) v(y) v(x) v(q)
+plot v(d) v(clk)+3 v(y)+6 v(x)+9 v(q)+12
+
+wrdata ./latch_tran.dat v(d) v(clk) v(clkb) v(dbar) v(y) v(x) v(q) i(vdd)
+
+.endc
+
+.end

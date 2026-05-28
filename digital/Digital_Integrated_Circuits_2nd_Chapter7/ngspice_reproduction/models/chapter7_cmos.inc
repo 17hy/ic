@@ -19,3 +19,8 @@
 Mp out in vdd vdd PMOS W={wpp} L={lch}
 Mn out in 0 0 NMOS W={wnn} L={lch}
 .ends inv
+
+.subckt tg in out clk clkb vdd wnn=1u wpp=2.75u lch=0.25u
+Mn out clk  in 0   NMOS W={wnn} L={lch}
+Mp out clkb in vdd PMOS W={wpp} L={lch}
+.ends tg

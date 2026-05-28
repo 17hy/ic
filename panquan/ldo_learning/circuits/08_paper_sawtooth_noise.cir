@@ -1,0 +1,33 @@
+* 08_paper_sawtooth_noise.cir
+* 25 mVpp, 1 MHz sawtooth supply noise suppression inspired by Fig. 5.
+* Outputs are small-signal ripple/noise values around the nominal supply.
+
+.include ./paper_dual_loop_ldo.inc
+.options reltol=1e-5 abstol=1e-12 vntol=1e-8 method=gear
+
+* A 25 mVpp sawtooth ripple, centered at 0 V, with 1 us period.
+Vin_ripple vin 0 PULSE(-12.5m 12.5m 0 900n 100n 1n 1u)
+
+Xdual vin ldo_ripple paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=50m gm_slow=72 fp_slow=120k gm_fast=15 fz_fast=20meg fp_fast=5gig
+
+* Front-end output-noise proxies. The TX path is modeled as more sensitive
+* to residual LDO ripple than the pseudo-differential RX path.
+Etx_noise tx_noise 0 ldo_ripple 0 0.305
+Erx_noise rx_noise 0 ldo_ripple 0 0.0305
+
+.tran 1n 6u 0 1n
+
+.control
+set filetype=ascii
+run
+wrdata 08_paper_sawtooth_noise.csv time v(vin) v(ldo_ripple) v(tx_noise) v(rx_noise)
+meas tran ldo_max max v(ldo_ripple) from=1u to=6u
+meas tran ldo_min min v(ldo_ripple) from=1u to=6u
+meas tran tx_max max v(tx_noise) from=1u to=6u
+meas tran tx_min min v(tx_noise) from=1u to=6u
+meas tran rx_max max v(rx_noise) from=1u to=6u
+meas tran rx_min min v(rx_noise) from=1u to=6u
+quit
+.endc
+
+.end

@@ -1,0 +1,33 @@
+* 09_paper_power_bounce.cir
+* Power-bounce suppression inspired by Fig. 6(a).
+* A fast load-current disturbance represents the RX front-end current
+* modulation under a 300 mVpp input excitation.
+
+.include ./paper_dual_loop_ldo.inc
+.options reltol=1e-5 abstol=1e-12 vntol=1e-8 method=gear
+
+* No external supply ripple in this experiment.
+Vin_zero vin 0 0
+
+Xconv vin bounce_conv paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=50m gm_slow=30 fp_slow=120k gm_fast=0 fz_fast=20meg fp_fast=5gig
+Xdual vin bounce_dual paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=50m gm_slow=72 fp_slow=120k gm_fast=15 fz_fast=400meg fp_fast=5gig
+
+* The same disturbance current is applied to both regulator outputs.
+* Current flows out of the LDO output into the front-end load.
+Istep_conv bounce_conv 0 PULSE(0 5.5m 2n 30p 30p 3n 6n)
+Istep_dual bounce_dual 0 PULSE(0 5.5m 2n 30p 30p 3n 6n)
+
+.tran 5p 25n 0 5p
+
+.control
+set filetype=ascii
+run
+wrdata 09_paper_power_bounce.csv time v(bounce_conv) v(bounce_dual)
+meas tran conv_max max v(bounce_conv) from=2n to=25n
+meas tran conv_min min v(bounce_conv) from=2n to=25n
+meas tran dual_max max v(bounce_dual) from=2n to=25n
+meas tran dual_min min v(bounce_dual) from=2n to=25n
+quit
+.endc
+
+.end

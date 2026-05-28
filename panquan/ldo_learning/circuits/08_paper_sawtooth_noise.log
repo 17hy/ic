@@ -1,0 +1,38 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * 08_paper_sawtooth_noise.cir
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+vin                                    -0.0125
+ldo_ripple                        -8.67667e-06
+xdual.cap_node                    -8.67667e-06
+xdual.err                         -8.67667e-06
+xdual.slow                        -8.67667e-06
+xdual.fast_hp                                0
+xdual.fast                                   0
+tx_noise                          -2.64638e-06
+rx_noise                          -2.64638e-07
+erx_noise#branch                             0
+etx_noise#branch                             0
+e.xdual.eerr#branch               -1.53856e-21
+vin_ripple#branch                            0
+
+
+No. of Data Rows : 6081
+ldo_max             =  2.90386e-04 at=  1.16455e-06
+ldo_min             =  -3.64669e-04 at=  1.01555e-06
+tx_max              =  8.85678e-05 at=  1.16455e-06
+tx_min              =  -1.11224e-04 at=  1.01555e-06
+rx_max              =  8.85678e-06 at=  1.16455e-06
+rx_min              =  -1.11224e-05 at=  1.01555e-06
+ngspice-46 done
