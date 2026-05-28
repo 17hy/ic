@@ -1,0 +1,28 @@
+* 01_operating_point.cir
+* Basic DC operating point of a 2.0 V PMOS LDO.
+
+.include ./ldo_macromodel.inc
+.options reltol=1e-5 abstol=1e-12 vntol=1e-6
+
+.param vin_nom=3.3
+.param vref_nom=1.2
+.param iload=50m
+
+Vvin vin 0 {vin_nom}
+Vref vref 0 {vref_nom}
+Iload vout 0 {iload}
+
+Xldo vin vout vref fb gate ldo_pmos params: rtop=400k rbot=600k cout=10u esr=50m fp_ea=20k wpass=30000u
+
+.op
+
+.control
+set filetype=ascii
+run
+print v(vin) v(vref) v(vout) v(fb) v(gate)
+wrdata 01_operating_point.csv v(vin) v(vref) v(vout) v(fb) v(gate)
+quit
+.endc
+
+.end
+

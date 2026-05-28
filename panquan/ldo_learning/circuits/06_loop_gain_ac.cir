@@ -1,0 +1,50 @@
+* 06_loop_gain_ac.cir
+* Linearized approximate loop-gain model for intuition.
+* The returned feedback signal is FB. With Vinj AC=1, vdb(fb) is loop gain magnitude.
+
+.options reltol=1e-5 abstol=1e-12 vntol=1e-6
+
+.param beta=0.6
+.param a0=4000
+.param fp_ea=20k
+.param rea=10k
+.param cea={1/(6.283185307179586*fp_ea*rea)}
+.param gm_pass=0.6
+.param vout_nom=2.0
+.param iload=50m
+.param rload={vout_nom/iload}
+.param ro_pass=200
+.param cout=10u
+.param esr=50m
+
+* Inject a 1 V AC signal at the broken-loop input.
+Vinj inj 0 AC 1
+
+* Error amplifier: negative sign models the inverting feedback path.
+Eea_raw ea_raw 0 inj 0 {-a0}
+Rea ea_raw ea {rea}
+Cea ea 0 {cea}
+
+* Pass device small-signal transconductance drives the output node.
+Gpass 0 vout ea 0 {gm_pass}
+
+* Output node impedance.
+Rload vout 0 {rload}
+Ropass vout 0 {ro_pass}
+Resr vout cout_node {esr}
+Cout cout_node 0 {cout}
+
+* Feedback factor.
+Efb fb 0 vout 0 {beta}
+
+.ac dec 200 1 100meg
+
+.control
+set filetype=ascii
+run
+wrdata 06_loop_gain_ac.csv frequency vdb(fb) vp(fb)
+quit
+.endc
+
+.end
+

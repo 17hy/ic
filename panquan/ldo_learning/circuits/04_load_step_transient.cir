@@ -1,0 +1,23 @@
+* 04_load_step_transient.cir
+* Load step transient: 10 mA -> 150 mA -> 10 mA.
+
+.include ./ldo_macromodel.inc
+.options reltol=1e-5 abstol=1e-12 vntol=1e-6 method=gear
+
+Vvin vin 0 3.3
+Vref vref 0 1.2
+Iload vout 0 PULSE(10m 150m 50u 1u 1u 150u 300u)
+
+Xldo vin vout vref fb gate ldo_pmos params: rtop=400k rbot=600k cout=10u esr=50m fp_ea=20k wpass=30000u cgate=300p
+
+.tran 0.2u 600u 0 0.2u
+
+.control
+set filetype=ascii
+run
+wrdata 04_load_step_transient.csv time v(vout) v(fb) v(gate) i(vvin)
+quit
+.endc
+
+.end
+
