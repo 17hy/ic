@@ -1,15 +1,22 @@
 * ch05_05_current_mirror_load_ota: five-transistor OTA with PMOS mirror load
+
 .include ../../models/educational_cmos.inc
+
+.param VDD=1.8
+
 Vdd vdd 0 {VDD}
 Vcm cm 0 DC 0.85
 Vdm dm 0 DC 0 AC 1m
+
 Bip inp 0 v={v(cm)+v(dm)/2}
 Bin inm 0 v={v(cm)-v(dm)/2}
-M1 x inp tail 0 NMOS W=8u L=0.18u
-M2 out inm tail 0 NMOS W=8u L=0.18u
-M3 x x vdd vdd PMOS W=10u L=0.18u
-M4 out x vdd vdd PMOS W=10u L=0.18u
-M5 tail nb 0 0 NMOS W=12u L=0.18u
+
+M1 x   inp tail 0   NMOS W=8u  L=0.18u
+M2 out inm tail 0   NMOS W=8u  L=0.18u
+M3 x   x   vdd  vdd PMOS W=10u L=0.18u
+M4 out x   vdd  vdd PMOS W=10u L=0.18u
+M5 tail nb 0    0   NMOS W=12u L=0.18u
+
 Vnb nb 0 DC 0.68
 
 .control
@@ -18,35 +25,30 @@ set wr_singlescale
 set wr_vecnames
 set hcopydevtype=svg
 
-* ==========================================
-* 1. 直流大信号扫描：差模输入扫描 (Vdm)
-* ==========================================
+* 差模输入 DC 扫描
 dc Vdm -0.25 0.25 0.002
 
-* 画出大信号传输特性 (Vout vs Vdm)
-plot v(out) vs v(dm) title "Large-Signal VTC (Vout vs Vdm)"
-hardcopy ../../results/ch05_05_current_mirror_load_ota_dc_vtc.svg v(out) vs v(dm)
+* 差模输入
+let vid = v(inp) - v(inm)
 
-* 画出差模增益曲线 (这里不加负号，因为是非反相放大)
-plot deriv(v(out)) vs v(dm) title "Differential DC Gain vs Vdm"
-hardcopy ../../results/ch05_05_current_mirror_load_ota_dc_gain.svg deriv(v(out)) vs v(dm)
+* 输入端电压
+plot v(inp) v(inm) vid title "Differential Input Voltages"
 
-wrdata ../../results/ch05_05_current_mirror_load_ota_dc.dat v(dm) v(out) v(x) v(tail)
+* 输出电压随差模输入变化
+plot v(out) vs vid title "Large-Signal VTC: Vout vs Vid"
 
-* ==========================================
-* 2. 交流小信号扫描：提取开环波特图
-* ==========================================
-* 注意：SPICE 会自动在 Vdm=0 (即 Vinp=Vinm=0.85V) 处计算静态工作点
-ac dec 80 10 10G
+* 差模增益
+plot deriv(v(out)) vs vid title "Differential DC Gain dVout/dVid"
 
-plot vdb(out) title "OTA Open-Loop AC Gain (dB)"
-hardcopy ../../results/ch05_05_current_mirror_load_ota_ac_gain.svg vdb(out)
-plot {180/PI*vp(out)} title "OTA Open-Loop Phase (Degrees)"
-hardcopy ../../results/ch05_05_current_mirror_load_ota_ac_phase.svg {180/PI*vp(out)}
+* 保存图片
+hardcopy ../../results/ch05_05_ota_input_nodes.svg v(inp) v(inm) vid
+hardcopy ../../results/ch05_05_ota_vout_vs_vid.svg v(out) vs vid
+hardcopy ../../results/ch05_05_ota_dc_gain_vs_vid.svg deriv(v(out)) vs vid
 
-wrdata ../../results/ch05_05_current_mirror_load_ota_ac.dat frequency vdb(out) vp(out)
+* 保存数据
+wrdata ../../results/ch05_05_ota_dc.dat vid v(inp) v(inm) v(out) v(x) v(tail)
 
-quit
+
 .endc
-.end
 
+.end

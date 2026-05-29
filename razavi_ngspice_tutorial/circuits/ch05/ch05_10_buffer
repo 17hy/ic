@@ -1,0 +1,53 @@
+* current_mirror_load_stage_with_diode_M2.cir
+* NMOS differential pair with PMOS current mirror load
+* M2 is diode-connected: gate and drain tied to Vout.
+
+.include ../../models/educational_cmos.inc
+
+.param VDD=1.8
+
+Vdd vdd 0 {VDD}
+
+* input voltage
+Vin vin 0 DC 0.8
+
+* tail current source bias
+Vb vb 0 DC 0.68
+
+* M1: left NMOS input transistor
+M1 x vin p 0 NMOS W=8u L=0.18u
+
+* M2: right NMOS, diode-connected to output
+M2 out out p 0 NMOS W=8u L=0.18u
+
+* M3: diode-connected PMOS
+M3 x x vdd vdd PMOS W=10u L=0.18u
+
+* M4: PMOS current mirror output transistor
+M4 out x vdd vdd PMOS W=10u L=0.18u
+
+* M5: NMOS tail current source
+M5 p vb 0 0 NMOS W=12u L=0.18u
+
+.control
+set noaskquit
+set wr_vecnames
+set wr_singlescale
+set hcopydevtype=svg
+
+* operating point
+op
+print v(vin) v(vb) v(x) v(p) v(out)
+
+* DC sweep Vin
+dc Vin 0 1.8 0.002
+
+plot v(out) vs v(vin) title "Vout vs Vin"
+plot v(x) v(p) v(out) title "Internal Nodes"
+
+wrdata ../../results/current_mirror_stage_dc.dat v(vin) v(out) v(x) v(p)
+
+
+.endc
+
+.end
