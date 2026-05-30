@@ -15,8 +15,12 @@ Xldo vin vout vref fb gate ldo_pmos params: rtop=400k rbot=600k cout=10u esr=50m
 .control
 set filetype=ascii
 run
+plot v(vout)
+plot v(fb)
+plot v(gate)
+plot i(vvin)
 wrdata 04_load_step_transient.csv time v(vout) v(fb) v(gate) i(vvin)
-quit
+
 .endc
 
 .end

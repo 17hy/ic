@@ -15,8 +15,11 @@ Xldo vin vout vref fb gate ldo_pmos params: rtop=400k rbot=600k cout=10u esr=50m
 .control
 set filetype=ascii
 run
+plot v(vout)
+plot v(fb)
+plot v(gate)
 wrdata 03_load_regulation.csv v(vout) v(fb) v(gate)
-quit
+
 .endc
 
 .end
