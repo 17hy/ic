@@ -1,0 +1,14 @@
+LTspice 26.0.2 for Windows
+Circuit: C:\Users\Guohu\Desktop\ngspice\razavi_ngspice_tutorial\circuits\ch04\diff.net
+Start Time: Fri May 29 16:36:54 2026
+solver = Normal
+Maximum thread count: 20
+tnom = 27
+temp = 27
+method = trap
+Total elapsed time: 0.066 seconds.
+
+Files loaded:
+C:\Users\Guohu\Desktop\ngspice\razavi_ngspice_tutorial\circuits\ch04\diff.net
+C:\Users\Guohu\AppData\Local\LTspice\lib\cmp\standard.mos
+
