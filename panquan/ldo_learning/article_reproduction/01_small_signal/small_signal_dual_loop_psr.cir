@@ -1,0 +1,28 @@
+* Small-signal dual-loop LDO PSR reproduction.
+* VIN ripple has AC=1, so vdb(out_*) is VOUT_ripple/VIN_ripple in dB.
+
+.include ../../circuits/paper_dual_loop_ldo.inc
+.options reltol=1e-5 abstol=1e-12 vntol=1e-8
+
+Vin_ripple vin 0 AC 1
+
+Xconv  vin out_conv  paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=50m gm_slow=30 fp_slow=120k gm_fast=0  fz_fast=20meg fp_fast=5gig
+Xworst vin out_worst paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=55m gm_slow=66 fp_slow=95k  gm_fast=11 fz_fast=20meg fp_fast=5gig
+Xtyp   vin out_typ   paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=50m gm_slow=72 fp_slow=120k gm_fast=15 fz_fast=20meg fp_fast=5gig
+Xbest  vin out_best  paper_dual_loop_ldo params: rload=31 cout=200p esr=50m gfeed=45m gm_slow=84 fp_slow=160k gm_fast=20 fz_fast=20meg fp_fast=5gig
+
+.ac dec 200 1k 1gig
+
+.control
+set filetype=ascii
+run
+wrdata results/small_signal_dual_loop_psr.csv frequency vdb(out_conv) vdb(out_worst) vdb(out_typ) vdb(out_best)
+meas ac psr_conv_1meg find vdb(out_conv) at=1meg
+meas ac psr_worst_1meg find vdb(out_worst) at=1meg
+meas ac psr_typ_1meg find vdb(out_typ) at=1meg
+meas ac psr_best_1meg find vdb(out_best) at=1meg
+quit
+.endc
+
+.end
+

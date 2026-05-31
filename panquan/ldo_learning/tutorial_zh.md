@@ -192,3 +192,12 @@ ngspice -b 09_paper_power_bounce.cir
 ```
 
 这 3 个例子分别对应 PSR 曲线、25 mVpp/1 MHz 锯齿供电噪声、以及普通慢环和双环 LDO 的 power-bounce 对比。
+
+## 10. 从论文宏模型到真实 PDK 器件
+
+如果要继续贴近论文，可以看 `real_device_modeling_zh.md`。目录里现在有两层更深入模型：
+
+- `paper_ldo_xcea_ssf_macro.inc`：不依赖 PDK，但包含 PMOS pass 管、反馈、XCEA-like 慢环、SSF-like 快环和 200 pF 输出电容。
+- `circuits/ihp_sg13g2/ihp_sg13g2_device_level_ldo.cir`：依赖 IHP SG13G2 Open PDK，使用 `sg13_hv_pmos`、`sg13_hv_nmos` 和 `npn13G2` 搭建。
+
+默认一键仿真会运行 `10_paper_xcea_ssf_macro_psr.cir` 和 `11_paper_xcea_ssf_macro_transient.cir`。IHP 模板需要先安装 PDK，所以放在子目录中单独运行。

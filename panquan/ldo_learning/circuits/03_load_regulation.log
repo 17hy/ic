@@ -11,4 +11,16 @@ Note: Starting dynamic gmin stepping
 Note: Dynamic gmin stepping completed
 
 No. of Data Rows : 250
-ngspice-46 done
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+
+Warning: command 'plot' is not available during batch simulation, ignored!
+    You may use Gnuplot instead.
+
+Note: Simulation executed from .control section 

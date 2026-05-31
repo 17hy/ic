@@ -1,0 +1,50 @@
+* PDK direct method: IHP SG13G2 real HV PMOS pass transistor.
+* The pass device is a real PDK PSP model; the XCEA/SSF drive is
+* behavioral so the direct run is robust before full op-amp sizing.
+
+.lib cornerMOShv.lib mos_tt
+.options reltol=1e-5 abstol=1e-12 vntol=1e-8
+
+.param rtop=950k
+.param rbot=600k
+.param a0=5000
+.param rea=10k
+.param fp_ea=120k
+.param cea={1/(6.283185307179586*fp_ea*rea)}
+.param cout=200p
+.param esr=80m
+
+Vvin vin 0 DC 3.3 AC 1
+Vref vref 0 1.2
+Iload vout 0 15m
+
+* IHP SG13G2 HV PMOS pin order: d g s b.
+Xmpass vout gate vin vin sg13_hv_pmos w=10u l=0.4u ng=10 m=180
+
+Rtop vout fb {rtop}
+Rbot fb 0 {rbot}
+
+Eea_raw ea_raw 0 vref fb {a0}
+Rea ea_raw ea {rea}
+Cea ea 0 {cea}
+
+Bslow slow_gate 0 V={min(max(V(vin)-V(ea),0),V(vin))}
+Rgate slow_gate gate 150
+Cgate gate vin 3p
+
+Resr vout cout_node {esr}
+Cout cout_node 0 {cout}
+Rbleed vout 0 100meg
+
+.control
+set filetype=ascii
+op
+print v(vin) v(vout) v(fb) v(gate) v(ea)
+ac dec 100 1k 1gig
+wrdata results/pdk_direct_sg13g2_psr.csv frequency vdb(vout) vp(vout) vdb(gate)
+meas ac psr_1meg find vdb(vout) at=1meg
+quit
+.endc
+
+.end
+

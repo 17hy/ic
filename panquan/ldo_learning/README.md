@@ -6,8 +6,11 @@
 
 - `tutorial_zh.md`：LDO 设计教程，按学习顺序展开。
 - `paper_dual_loop_ldo_zh.md`：论文第 II-B 节双环 LDO 的复现笔记。
+- `real_device_modeling_zh.md`：论文结构宏模型和 IHP SG13G2 真实器件级建模路线。
+- `article_reproduction/`：按小信号、大信号、PDK 级直接法整理后的论文 LDO 复现目录，含独立运行脚本和结果。
 - `circuits/ldo_macromodel.inc`：教学用 PMOS LDO 子电路。
 - `circuits/paper_dual_loop_ldo.inc`：论文启发的 XCEA + SSF 双环 LDO 小信号宏模型。
+- `circuits/paper_ldo_xcea_ssf_macro.inc`：论文结构完整的大信号 LDO 宏模型。
 - `circuits/01_operating_point.cir`：基本工作点。
 - `circuits/02_line_regulation.cir`：输入电压扫描和 dropout 观察。
 - `circuits/03_load_regulation.cir`：负载电流扫描。
@@ -17,6 +20,9 @@
 - `circuits/07_paper_dual_loop_psr.cir`：论文双环 LDO 的 PSR 复现。
 - `circuits/08_paper_sawtooth_noise.cir`：25 mVpp、1 MHz 锯齿电源噪声复现。
 - `circuits/09_paper_power_bounce.cir`：普通慢环与双环 LDO 的 power-bounce 对比。
+- `circuits/10_paper_xcea_ssf_macro_psr.cir`：带 pass 管、反馈、XCEA/SSF 节点的大信号 PSR 仿真。
+- `circuits/11_paper_xcea_ssf_macro_transient.cir`：大信号模型的锯齿供电噪声和负载扰动瞬态。
+- `circuits/ihp_sg13g2/`：IHP SG13G2 Open PDK 器件级模板。
 - `run_all.ps1`：在 Windows PowerShell 中一键运行所有 `.cir` 文件。
 
 ## 快速运行
@@ -45,3 +51,4 @@ ngspice -b 01_operating_point.cir
 5. 运行 `05_psrr_ac.cir`，理解输入纹波如何耦合到输出。
 6. 运行 `06_loop_gain_ac.cir`，把误差放大器、pass 管、输出电容、反馈系数串起来看环路增益。
 7. 阅读 `paper_dual_loop_ldo_zh.md`，再运行 `07` 到 `09`，学习论文中 S2D/D2S 双环 LDO 的 PSR 和 power-bounce 抑制方法。
+8. 阅读 `real_device_modeling_zh.md`，再运行 `10` 和 `11`，最后在装好 IHP SG13G2 后尝试 `circuits/ihp_sg13g2/`。

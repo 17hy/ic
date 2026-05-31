@@ -1,0 +1,27 @@
+* Large-signal transient with 25 mVpp supply ripple and load disturbance.
+
+.include ../../circuits/paper_ldo_xcea_ssf_macro.inc
+.options reltol=1e-5 abstol=1e-12 vntol=1e-8 method=gear
+
+Vvin vin 0 PULSE(3.2875 3.3125 0 900n 100n 1n 1u)
+Vref vref 0 1.2
+Iload_dc vout 0 15m
+Iload_step vout 0 PULSE(0 5m 2u 1n 1n 80n 500n)
+
+Xldo vin vout vref fb gate xcea ssf paper_ldo_xcea_ssf_macro
+
+.tran 1n 6u 0 1n
+
+.control
+set filetype=ascii
+run
+wrdata results/large_signal_xcea_ssf_transient.csv time v(vin) v(vout) v(fb) v(gate) v(xcea) v(ssf)
+meas tran vout_max max v(vout) from=1u to=6u
+meas tran vout_min min v(vout) from=1u to=6u
+meas tran gate_max max v(gate) from=1u to=6u
+meas tran gate_min min v(gate) from=1u to=6u
+quit
+.endc
+
+.end
+

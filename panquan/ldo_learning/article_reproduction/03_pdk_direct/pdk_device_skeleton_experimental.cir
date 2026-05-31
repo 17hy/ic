@@ -1,0 +1,5 @@
+* Experimental all-device skeleton for later sizing.
+* This file is intentionally not the calibrated result path. Use
+* pdk_direct_sg13g2_psr.cir for the direct PDK result.
+
+.include ../../../circuits/ihp_sg13g2/ihp_sg13g2_device_level_ldo.cir

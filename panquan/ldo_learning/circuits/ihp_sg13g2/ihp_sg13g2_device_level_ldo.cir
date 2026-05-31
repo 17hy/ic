@@ -1,0 +1,71 @@
+* ihp_sg13g2_device_level_ldo.cir
+* Device-level starting point for the paper-inspired LDO in IHP SG13G2.
+*
+* Requires IHP Open PDK ngspice setup:
+*   PDK_ROOT=<path to IHP-Open-PDK>
+*   PDK=ihp-sg13g2
+*   ngspice sourcepath includes $PDK_ROOT/$PDK/libs.tech/ngspice/models
+*   OSDI PSP/R3/MOSVAR modules are loaded by .spiceinit.
+
+.lib cornerMOShv.lib mos_tt
+.lib cornerHBT.lib hbt_typ
+.options reltol=1e-5 abstol=1e-12 vntol=1e-8 method=gear
+
+.param rtop=950k
+.param rbot=600k
+.param cout=200p
+.param esr=80m
+
+Vvin vin 0 DC 3.3 AC 1
+Vref vref 0 1.2
+Iload vout 0 10m
+
+* 3.3 V high-voltage PMOS pass device.
+* sg13_hv_pmos pin order: d g s b.
+Xmpass vout gate vin vin sg13_hv_pmos w=10u l=0.4u ng=10 m=40
+
+* Feedback for 3.1 V nominal output from 1.2 V reference.
+Rtop vout fb {rtop}
+Rbot fb 0 {rbot}
+
+* CMOS XCEA-like slow-loop core using HV MOS devices.
+* This is intentionally conservative and easy to modify.
+Ibias tail 0 DC 80u
+Xmn_fb  nfb  fb   tail 0   sg13_hv_nmos w=2u l=0.45u ng=2 m=4
+Xmn_ref nref vref tail 0   sg13_hv_nmos w=2u l=0.45u ng=2 m=4
+Xmp_l   nfb  nfb  vin  vin sg13_hv_pmos w=4u l=0.4u  ng=2 m=4
+Xmp_r   nref nfb  vin  vin sg13_hv_pmos w=4u l=0.4u  ng=2 m=4
+
+* Weak cross-coupled PMOS pair, echoing the paper's XCEA idea.
+Xmp_x1 nfb  nref vin vin sg13_hv_pmos w=1u l=0.4u ng=1 m=1
+Xmp_x2 nref nfb  vin vin sg13_hv_pmos w=1u l=0.4u ng=1 m=1
+
+* Buffer the XCEA output into the large pass-gate capacitance.
+Rgate_slow nref gate 8k
+Cgate gate vin 3p
+
+* NPN13G2 source-follower assist path.
+* npn13G2 pin order: c b e substrate.
+* The coupling capacitor makes it a fast path, not a DC regulator.
+Chp vout ssf_base 120f
+Rssf_bias ssf_base nref 8k
+Xssf vin ssf_base ssf_emit 0 npn13G2 Nx=4
+Rssf_emit ssf_emit gate 120
+
+* Output capacitor. Use ideal C here first; replace with SG13G2 MIM cap
+* cells after the loop behavior is understood.
+Resr vout cout_node {esr}
+Cout cout_node 0 {cout}
+Rbleed vout 0 100meg
+
+.control
+set filetype=ascii
+op
+print v(vin) v(vout) v(fb) v(gate) v(nref)
+ac dec 100 1k 1gig
+wrdata ihp_sg13g2_device_level_ldo_psr.csv frequency vdb(vout) vp(vout) vdb(gate)
+meas ac psr_1meg find vdb(vout) at=1meg
+quit
+.endc
+
+.end

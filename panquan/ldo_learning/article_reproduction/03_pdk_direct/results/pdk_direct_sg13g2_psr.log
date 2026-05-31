@@ -1,0 +1,27 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * pdk direct method: ihp sg13g2 real hv pmos pass transistor.
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+No. of Data Rows : 1
+v(vin) = 3.300000e+00
+v(vout) = 3.099433e+00
+v(fb) = 1.199781e+00
+v(gate) = 2.202725e+00
+v(ea) = 1.097275e+00
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: Starting dynamic gmin stepping
+Note: Dynamic gmin stepping completed
+
+No. of Data Rows : 601
+psr_1meg            =  -4.89020e+01
+ngspice-46 done

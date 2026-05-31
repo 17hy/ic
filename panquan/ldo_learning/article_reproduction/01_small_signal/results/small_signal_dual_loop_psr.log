@@ -1,0 +1,17 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * small-signal dual-loop ldo psr reproduction.
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Note: vin_ripple: has no value, DC 0 assumed
+
+No. of Data Rows : 1201
+psr_conv_1meg       =  -3.70912e+01
+psr_worst_1meg      =  -4.03122e+01
+psr_typ_1meg        =  -4.39118e+01
+psr_best_1meg       =  -4.87341e+01
+ngspice-46 done
