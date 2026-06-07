@@ -1,0 +1,66 @@
+* 04 - Capacitor-drop rectifier plus fixed-ratio switched-capacitor macro
+* The SC stage is modeled as VOUT ~= VREC/N with output resistance.
+* Two copies compare small and large CREC values to show why fixed-ratio SC needs a large reservoir.
+
+.options method=gear reltol=1e-4 abstol=1e-9 vntol=1e-5
+.param vrms=230
+.param fline=50
+.param vpk={sqrt(2)*vrms}
+.param cx=0.68u
+.param nratio=10
+.param rload=13.3
+.param rin={nratio*nratio*rload}
+.param rout=0.8
+
+* Case A: small reservoir capacitor.
+VLINE_S mains_s neutral_s SIN(0 {vpk} {fline})
+RREFN_S neutral_s 0 1G
+CX_S mains_s xmid_s {cx}
+RESR_X_S xmid_s acx_s 5
+RBLEEDX_S mains_s acx_s 10Meg
+DREC1_S acx_s recp_s DHV
+DREC2_S neutral_s recp_s DHV
+DCREC3_S 0 acx_s DHV
+DCREC4_S 0 neutral_s DHV
+CREC_S recp_s 0 4.7u
+RIN_S recp_s 0 {rin}
+E_SC_S ideal_s 0 recp_s 0 {1/nratio}
+RSC_S ideal_s out_s {rout}
+COUT_S out_s 0 100u
+RLOAD_S out_s 0 {rload}
+
+* Case B: large reservoir capacitor.
+VLINE_L mains_l neutral_l SIN(0 {vpk} {fline})
+RREFN_L neutral_l 0 1G
+CX_L mains_l xmid_l {cx}
+RESR_X_L xmid_l acx_l 5
+RBLEEDX_L mains_l acx_l 10Meg
+DREC1_L acx_l recp_l DHV
+DREC2_L neutral_l recp_l DHV
+DCREC3_L 0 acx_l DHV
+DCREC4_L 0 neutral_l DHV
+CREC_L recp_l 0 47u
+RIN_L recp_l 0 {rin}
+E_SC_L ideal_l 0 recp_l 0 {1/nratio}
+RSC_L ideal_l out_l {rout}
+COUT_L out_l 0 100u
+RLOAD_L out_l 0 {rload}
+
+.model DHV D(Is=1n Rs=0.5 N=1.2 Cjo=5p Bv=800 Ibv=10u)
+
+.tran 20u 500m 350m 50u
+.control
+run
+meas tran avg_vrec_s AVG v(recp_s) from=350m to=500m
+meas tran pp_vrec_s PP v(recp_s) from=350m to=500m
+meas tran avg_vout_s AVG v(out_s) from=350m to=500m
+meas tran pp_vout_s PP v(out_s) from=350m to=500m
+meas tran avg_vrec_l AVG v(recp_l) from=350m to=500m
+meas tran pp_vrec_l PP v(recp_l) from=350m to=500m
+meas tran avg_vout_l AVG v(out_l) from=350m to=500m
+meas tran pp_vout_l PP v(out_l) from=350m to=500m
+print avg_vrec_s pp_vrec_s avg_vout_s pp_vout_s avg_vrec_l pp_vrec_l avg_vout_l pp_vout_l
+wrdata 04_cap_drop_fixed_ratio_sc_macro.csv time v(recp_s) v(out_s) v(recp_l) v(out_l)
+quit
+.endc
+.end

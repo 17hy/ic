@@ -1,0 +1,47 @@
+* 01 - Offline bridge/bulk plus isolated flyback average macro
+* Educational topology-level model for the "traditional isolated AC-DC" path.
+* 230 Vrms mains is represented by its rectified bulk bus, about 325 Vdc.
+*
+* This average macro is intended for learning the power path:
+* high-voltage bulk bus -> transformer-isolated flyback ratio -> low-voltage output.
+* It is not a magnetic design or switch-transition model.
+
+.options method=gear reltol=1e-5 abstol=1e-10 vntol=1e-6
+.param vbus_nom=325
+.param duty=0.27
+.param nps=10
+.param eta=0.80
+.param rload=144
+.param gain={duty/(1-duty)/nps}
+.param pout_nom={12*12/rload}
+.param rin_equiv={vbus_nom*vbus_nom/(pout_nom/eta)}
+
+VBUS bus 0 DC {vbus_nom}
+CBULK bus 0 10u
+
+* Equivalent input load so the HV bus is not an energy-free source in the plot.
+RIN bus 0 {rin_equiv}
+
+* Flyback CCM voltage relation: VOUT ~= D/(1-D) * (NS/NP) * VBUS.
+* nps = NP/NS, so NS/NP = 1/nps.
+* The isolated secondary reference is tied to 0 only as a SPICE reference.
+EFLY ideal 0 bus 0 {gain}
+RSRC ideal out 1.0
+COUT out 0 220u IC=0
+RLOAD out 0 {rload}
+
+* Reflected switch stress estimate: VDS ~= VBUS + (NP/NS)*VOUT.
+BDRAIN drain 0 V={V(bus) + nps*(V(out) + 0.7)}
+
+.tran 10u 8m 0 10u uic
+.control
+run
+meas tran avg_vbus AVG v(bus) from=6m to=8m
+meas tran avg_vout AVG v(out) from=6m to=8m
+meas tran pp_vout PP v(out) from=6m to=8m
+meas tran max_vdrain MAX v(drain) from=6m to=8m
+print avg_vbus avg_vout pp_vout max_vdrain
+wrdata 01_isolated_flyback_acdc.csv time v(bus) v(out) v(drain)
+quit
+.endc
+.end

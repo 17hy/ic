@@ -1,0 +1,162 @@
+                                                                                                                                               ISSCC 2026 / SESSION 19 / HIGH-VOLTAGE, ISOLATED AND DISPLAY POWER / 19.9
+
+                                                                                                                   19.9                                  A 2.15W 120V/230Vac to 5-to-12Vdc Ofﬂine Power Converter with Full-Duty-Cycle Input-Series Dual-Branch Converter Achieving
+                                                                                                                                                         1088mW/cm3 and 87.2% Peak Efﬁciency
+
+                                                                                                                                                         Gang Liu1,2, Junmin Jiang2, Sijun Du3, Xun Liu1
+                                                                                                                                                         1
+                                                                                                                                                          Chinese University of Hong Kong, Shenzhen, China, 2Southern University of Science and Technology, Shenzhen, China, 3TU Delft, Delft, The Netherlands
+
+                                                                                                                                                                                                                                         Abstract
+                                                                                                                              This paper presents a 120V/230Vac to 5-to-12Vdc ofﬂine power converter consisting of a                             D/2 and reduces both the CREC volume and the voltage stress on components, while
+                                                                                                                              capacitor-drop AC-DC rectiﬁer and a full-duty-cycle input-series dual-branch DC-DC                                 achieving high efﬁciency across a broad input and output voltage range. 87.2% peak
+                                                                                                                              converter for IoT devices. The proposed converter operates at full-duty-cycle with VCR of                          efﬁciency, 2.15W output power, and 1088mW/cm3 power density are achieved.
+
+                                                                                                                                               The rapid growth of Internet of Things (IoT) devices and sensors in smart home systems            As shown in Fig. 19.9.2, the ISDB converter can be simpliﬁed into two branches: Branch P
+                                                                                                                                               has increased the demand for efﬁcient and compact ofﬂine power converters that transfer           comprises CH, S1, S2, and L1, while branch N includes CL, S3, S4, S5, and L2. The inputs of
+                                                                                                                                               power from the AC mains to low DC voltages. Traditional ofﬂine power converters are               the two branches are in series, and the outputs are in parallel. Consequently, both the
+                                                                                                                                               typically implemented with isolated ﬂyback [1] or forward [2] topologies, which require           switches and capacitors withstand only VREC/2. Both branches have the same VOUT and can
+                                                                                                                                               bulky transformers to step down the AC voltage (120/230VRMS), limiting the power density          be controlled independently without mutual interference. The ISDB converter extends the
+                                                                                                                                               to typically less than ~500mW/cm3 [1]. In recent years, non-isolated AC-DC converters [3-         duty cycle to 1 while achieving a VCR of D/2. Figure 19.9.2 then shows the operating
+                                                                                                                                               15] are gaining popularity due to their compact form factor. Direct AC-DC converters [3-5]        principle. In the steady state, the voltages across CH and CL are typically VREC/2 = 30V and
+                                                                                                                                               use high-voltage (HV) low-dropout regulators (LDOs) [3] or DC-DC converters [4,5] to step         −VREC/2 = −30V. In Φ1, S1 is turned on and VSW1 = 30V. S3 and S4 are also turned on. The
+2026 IEEE International Solid-State Circuits Conference (ISSCC) | 979-8-3315-8936-3/26/$31.00 ©2026 IEEE | DOI: 10.1109/ISSCC49663.2026.11409104
+
+
+
+
+                                                                                                                                               down the rectiﬁed high voltage (>325V) to a low DC voltage of 3.3-to-12V. These extremely         ﬂying capacitor CF is connected in parallel with CL, resulting in VCF = −30V and VSW2 = 0. In
+                                                                                                                                               high voltage conversion ratios (VCRs) lead to low efﬁciency and bulky volume. The                 Φ2, S2 and S5 are on, VSW1 = 0 and VSW2 = −VCF = 30V. In Φ3, S2, S3, and S4 are on, resulting
+                                                                                                                                               capacitor-drop AC-DC converter [6-9] uses an X-capacitor as a buffer to withstand most of         in VSW1 = VSW2 = 0. In Φ4, S1 and S5 are on, so VSW1 = VSW2 = 30V. To keep two voltages of
+                                                                                                                                               the high voltage and reduce the rectiﬁers’ input and output voltages. It offers a higher          CH and CL equal, a VCH and VCL balance loop is shown in Fig. 19.9.2. The concept is to adjust
+                                                                                                                                               integration level [6], a reduced VCR for the DC-DC stage [7], and higher system efﬁciency         the duty cycles to control the powers in each branch. When VCH>VCL due to disturbances,
+                                                                                                                                               [8,9]; however, it struggles with limited output power, large ﬁltering capacitor (CREC) volume,   the loop makes D1>D2, and more current is delivered from branch P to the load, reducing
+                                                                                                                                               and low light-load efﬁciency.                                                                     VCH and raising VCL, until VCH = VCL. Owing to the characteristics of the input-series output-
+                                                                                                                                                                                                                                                 parallel topology [16], the output currents of both branches, which are the inductor currents
+                                                                                                                                               As shown in Fig. 19.9.1, the theoretical output power PREC of a capacitor-drop AC-DC rectiﬁer     in the ISDB converter, are proportional to the input voltages, so IL1/IL2 = VCH/VCL. In this way,
+                                                                                                                                               is PREC = 4fLINEVRECCX(√2VLINE-VREC). The frequency and voltage of the AC mains (fLINE and        the VCH and VCL balance loop also ensures IL1 and IL2 balance, thus improving efﬁciency
+                                                                                                                                               VLINE) are ﬁxed, and increasing CX brings more idle power loss. Thus, increasing PREC             while eliminating complex current-sensing and regulation circuitries.
+                                                                                                                                               requires raising the rectiﬁer’s output voltage VREC, as demonstrated by prior arts increasing
+                                                                                                                                               it from 23V [7] to 60V [8] and 70V [9] to achieve up to 1.52W of output power POUT.               Figure 19.9.3 shows the system diagram. The power stage of the AC-DC rectiﬁer consists
+                                                                                                                                               However, this necessitates a higher VCR in the subsequent DC-DC stage. In [8] and [9],            of four 70V-LDMOS (M1-4), two 70V-diodes (D1-2), and ﬁve off-chip capacitors CX, CP1, P2,
+                                                                                                                                               switched-capacitor (SC) converters with 1/10× and 1/14× VCRs are utilized. The SC                 and CH, L. CX is a 310VAC ﬁlm capacitor and carries most of the AC voltage. CP1 and CP2 reduce
+                                                                                                                                               converters can only achieve high efﬁciency within a narrow voltage range near their ideal         idle power, and 70V low-proﬁle ceramic capacitors are used. Low and high-side transistors
+                                                                                                                                               VCRs. As such, a large-volume ﬁltering capacitor CREC (aluminum electrolytic,                     in the rectiﬁer bridge are realized with NMOS devises and diodes, respectively. The
+                                                                                                                                               47μF@63V/80V) is required to suppress the ripple voltage of VREC, severely limiting power         hysteresis controller generates the gate signals VGM1-4 of M1-4. CH and CL are implemented
+                                                                                                                                               density. Furthermore, the complex SC structures required for high VCRs result in higher           using 35V-rated aluminum electrolytic capacitors. For the ISDB DC-DC converter, the
+                                                                                                                                               output resistance and switching loss, limiting the maximum output power and light-load            switches S1-5 are implemented with 40V-LDMOSs. S2,3,4 are implemented using NMOSs to
+                                                                                                                                               efﬁciency. Consequently, the POUT in [8] and [9] reached only 33% and 48% of the 3.18W            reduce on-resistance, and S1,3 are PMOS transistors for easy driving. CF is a 35V-rated
+                                                                                                                                               theoretical PREC, respectively. In summary, SC stages with high VCRs have the drawbacks           ceramic capacitor. A type-III compensation is used for the voltage regulation loop. The VCH
+                                                                                                                                               of a narrow voltage range and a large output resistance, which constrains their output            and VCL balance loop ﬁrst senses the mismatch between the voltage of VREC_P + VREC_N and
+                                                                                                                                               power, voltage range, power density, and peak efﬁciency.                                          GND and then gets the error voltage VEA_B from the error ampliﬁer. VEA_B is used to modify
+                                                                                                                                                                                                                                                 the magnitude of Ramp1 and Ramp2 to modulate the duty cycles of D1 and D2 until the
+                                                                                                                                               To resolve these issues, we propose an architecture, shown in Fig. 19.9.1, that integrates        balance is achieved. A DCM calibration loop is also designed to enhance the light-load
+                                                                                                                                               two key components: 1) a three-mode capacitor-drop AC-DC rectiﬁer [8] to mitigate bridge          efﬁciency. Before turning off S2, the VSW1 node and GND voltages are both sampled and
+                                                                                                                                               voltage stress, reduce idle power, and enhance light-load efﬁciency; and 2) a full-duty-cycle,    then processed by a type-I compensator to generate the error signal VEA_DCM. As illustrated
+                                                                                                                                               input-series dual-branch (ISDB) DC-DC converter. The ISDB converter replaces the                  in Fig. 19.9.3, the reverse inductor current reduces VEA_DCM, which advances the turning-off
+                                                                                                                                               traditional SC converter and yields a reduced CREC volume, enhanced load capability, and          point of S2, and in this way, negative inductor current is gradually eliminated. Measurement
+                                                                                                                                               higher efﬁciency. This architecture leverages the fact that the AC-DC rectiﬁer’s output voltage   results verify that under light-load DCM conditions with VREC = 50V and VOUT = 5V, the
+                                                                                                                                               (VREC) and the DC-DC converter’s ground are not required to share the same reference. Two         efﬁciency of the ISDB converter is improved by up to 14%. This approach enhances the
+                                                                                                                                               series-connected capacitors (CH and CL) are placed across VREC, with the DC-DC converter’s        light-load efﬁciency of the AC-DC converter from 51% [8] to 78%.
+                                                                                                                                               ground deﬁned at their mid-point. This splits the high VREC voltage domain into two
+                                                                                                                                               symmetric lower-voltage domains: a positive domain (VREC/2) across CH and a negative              The AC-DC rectiﬁer was fabricated in a 180nm HV SOI process with an area of
+                                                                                                                                               domain (−VREC/2) across CL. A buck converter regulates the positive voltage, yielding             1.45mm×0.6mm. To lower the cost, the ISDB converter was implemented in a 180nm BCD
+                                                                                                                                               VOUT = D×VREC/2, while an inverting buck converter regulates the negative voltage with            process, with an area of 3.03mm×0.55mm. Figure 19.9.4 presents the measured waveforms
+                                                                                                                                               VOUT = −D×−VREC/2. The output currents from both inductors are combined to supply the             when VLINE = 230V@50Hz and VOUT = 5V. Although VREC varies between ~30V and ~54V, the
+                                                                                                                                               load. Critically, as each branch now handles only VREC/2, the required voltage rating for all     converter maintains a regulated 5V output, indicating a relaxed VREC ripple requirement.
+                                                                                                                                               components, including ﬁltering capacitors, ﬂying capacitor, power transistors, and isolation      Figure 19.9.4 also shows the measured steady-state waveforms of the ISDB converter under
+                                                                                                                                               rings, is halved. Furthermore, this dual-branch conﬁguration, operating at a full duty cycle      various input and output voltages. At VREC = 30V, VOUT = 5V, and IOUT = 0.05A, the converter
+                                                                                                                                               with a conversion ratio of D/2, supports a signiﬁcantly wider input voltage range than a          operates in DCM. It was observed that the DCM calibration loop effectively eliminates
+                                                                                                                                               ﬁxed-ratio SC converter. This inherent voltage ﬂexibility relaxes the VREC ripple requirement,    negative currents in IL1 and IL2. When the input voltage and output current increase to 60V
+                                                                                                                                               allowing the total capacitance (CH and CL) to be reduced by approximately 30%. The total          and 0.4A, the ISDB converter operates in continuous condition mode (CCM). As expected,
+                                                                                                                                               inductor plus capacitors’ volume in the ISDB converter is nearly identical to that of the prior   when duty cycle D = 0.8>0.5, overlapping occurs at VREC = 30V and VOUT = 12V,
+                                                                                                                                               SC converters. Thereby, the overall converter volume is reduced. Compared to the SC               demonstrating support for a wide range of input and output voltages.
+                                                                                                                                               converter, the ISDB converter also sustains much higher efﬁciency across broad voltage
+                                                                                                                                               and load ranges, increasing POUT under the same VREC. To ensure equal voltage allocation          Figure 19.9.5 illustrates the measured load transient response waveforms of the ISDB
+                                                                                                                                               between CH and CL, a voltage balance scheme is proposed, which guarantees the reliability         converter for VOUT = 5V. When the load current is switched between 50-to-500mA with
+                                                                                                                                               of the converter and simultaneously balances the inductor currents in the two branches.           ~30ns edges, the under- and over-shoots are 400mV and 200mV, respectively. It can be
+                                                                                                                                               Finally, a discontinuous conduction mode (DCM) calibration loop is implemented to reduce          observed that the currents are well equalized by the VCH and VCL balance loop. The reverse
+                                                                                                                                               inductor losses further and improve light-load efﬁciency.                                         inductor currents after transients are eliminated by the DCM calibration loop. Figure 19.9.5
+                                                                                                                                                                                                                                                 also shows the measured efﬁciencies of the ISDB converter and the overall AC-DC converter
+
+                                                                                                                                                                   Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:43:15 UTC from IEEE Xplore. Restrictions apply.
+                                                                                                                                                   336 • 2026 IEEE International Solid-State Circuits Conference                                                                      979-8-3315-8936-3/26/$31.00 ©2026 IEEE
+                                                                                                                    ISSCC 2026 / February 17, 2026 / 4:50 PM
+under different AC input and DC output voltages. When VLINE = 230VRMS@50Hz and              [10] T. Lu et al., “A 0.49W 120-230VRMS to 8.12VDC Power Converter with Switched-
+VOUT = 12V, an 87.2% peak efﬁciency is achieved. The maximum output power is 2.15W.         Capacitor Regulation and Rectiﬁer Short Flipping Achieving Maximized Bridge Conduction
+This work also maintains high efﬁciency across various output voltages and load currents.   Time,” CICC, pp. 1–3, Apr. 2025. http://doi.org/10.1109/CICC63670.2025.10983403
+                                                                                            [11] J. Shi et al., “A 9.1mW All-5V-CMOS Series-Capacitor AC-DC Converter with CF
+Figure 19.9.6 benchmarks the performance in terms of power density, output power, and       Reallocation Operations for 85-230VRMS Mains Achieving 85.6% Efﬁciency at 858mW/cm3
+efﬁciency. Figure 19.9.6 also presents the comparison with the state-of-the-art designs.    Density,” VLSI, pp. 1-3, June 2025.
+Among the compared designs in Fig. 19.9.6, this work achieves the highest maximum           http://doi.org/10.23919/VLSITechnologyandCir65189.2025.11075089
+output power of 2.15W, and the highest efﬁciency of 86.7% at maximum output power.          [12] A. A. Tamez et al., “An Integrated 120 Volt AC Mains Voltage Interface in Standard
+The highest power density of 1088W/cm3 is also achieved. Additionally, the light-load       130 nm CMOS,” ESSCIRC, pp. 238–241, Sep. 2010.
+efﬁciency is improved by at least 18% compared to the prior art in Fig. 19.9.6. Figure      http://doi.org/10.1109/ESSCIRC.2010.5619885
+19.9.7 shows the chip micrograph and PCB photos.                                            [13] H. Meyvaert et al., “A 265 VRMS Mains Interface Integrated in 0.35 μm CMOS,” IEEE
+                                                                                            JSSC, vol. 48, no. 7, pp. 1558–1564, Jul. 2013.
+Acknowledgment:                                                                             http://doi.org/10.1109/JSSC.2013.2253214
+This work was supported in part by the National Natural Science Foundation of China         [14] D. Lutz et al., “An Integrated 3-mW 120/230-V AC Mains Micropower Supply,” IEEE
+(62474153 and 62261160647), by the Guangdong Basic and Applied Basic Research               J. Emerg. Sel. Topics Power Electron., vol. 6, no. 2, pp. 581–591, Jun. 2018.
+Foundation (2025A1515011313 and 2025A1515010698), by the Shenzhen Science and               http://doi.org/10.1109/JESTPE.2018.2798504
+Technology Program (JCYJ20240813100601003), by the State Key Laboratory of Radio            [15] E. De Pelecijn et al., “A Fully Integrated Switched-Capacitor-Based AC–DC Converter
+Frequency Heterogeneous Integration (Open Scientiﬁc Research Program) (KF2025016),          for a 120 VRMS Mains Interface,” IEEE JSSC, vol. 54, no. 7, pp. 2009–2018, Jul. 2019.
+and High-level Special Funds of SUSTech (G03034K007). Corresponding author: Xun Liu;        http://doi.org/10.1109/JSSC.2019.2906750
+Junmin Jiang.                                                                               [16] X. Yang et al., “A 5V Input 98.4% Peak Efﬁciency Reconﬁgurable Capacitive-Sigma
+                                                                                            Converter with Greater than 90% Peak Efﬁciency for the Entire 0.4~1.2V Output Range,”
+References:                                                                                 ISSCC, pp. 108–110, Feb. 2022. http://doi.org/10.1109/ISSCC42614.2022.9731550.
+[1] C. Rindﬂeisch et al., “A Highly-Integrated 20-300V 0.5W Active-Clamp Flyback DCDC
+Converter with 76.7% Peak Efﬁciency,” CICC, pp. 1–2, Apr. 2022.
+http://doi.org/10.1109/CICC53496.2022.9772834
+[2] L. Xu et al., “A Two-Transistor Forward Converter With Variable Turn Ratio Using Dual
+Optocouplers to Automatically Adjust Crossover Frequency,” IEEE Trans. Circuits Syst.
+II, vol. 70, no. 12, pp. 4414–4418, Dec. 2023. http://doi.org/10.1109/TCSII.2023.3288044
+[3] M. Pomper et al., “On-Chip Power Supply for 110 V Line Input,” IEEE JSSC, vol. 13,
+no. 6, pp. 882–886, Dec. 1978. http://doi.org/10.1109/JSSC.1978.1052063
+[4] C. Rindﬂeisch et al., “A 110/230 V AC and 15–400 V DC 0.3 W Power-Supply IC with
+Integrated Active Zero-Crossing Buffer,” IEEE JSSC, vol. 57, no. 12, pp. 3816–3824, Dec.
+2022. http://doi.org/10.1109/JSSC.2022.3199653
+[5] T. Van Daele et al., “Monolithic 230-VRMS -to-12-VDC AC–DC Converter at 9 mW/mm2
+Enabled by a 31–325-VDC Input Range Capacitive Multi-Ratio DC–DC Converter,” IEEE
+JSSC, vol. 59, no. 4, pp. 1067–1077, Apr. 2024.
+http://doi.org/10.1109/JSSC.2023.3340976
+[6] N. O. Sokal et al., “A Capacitor-Fed, Voltage-Step-Down, Single-Phase, Non-Isolated
+Rectiﬁer,” APEC, pp. 208–215, Feb. 1998. http://doi.org/0.1109/APEC.1998.647693                                                                                                        19
+[7] Y. Ramadass et al., “A 120mA Non-Isolated Capacitor-Drop AC/DC Power Supply,”
+ISSCC, pp. 290–292, Feb. 2020.
+http://doi.org/10.1109/ISSCC19947.2020.9062968
+[8] G. Liu et al., “An 85-264Vac to 3-4.2Vdc 1.05W Capacitive Power Converter with Idle
+Power Reduction and 4-Phase 1/10X SC Converter Achieving 5.11mW Quiescent Power
+and 78.2% Peak Efﬁciency,” ISSCC, pp. 512–513, Feb. 2024.
+http://doi.org/10.1109/ISSCC49657.2024.10454521
+[9] F. Song et al., “An 85-to-230VAC to 3.3-to-4.6VDC 1.52W Capacitor-Drop Sigma-
+Floating-SC AC-DC Converter with 81.3% Peak Efﬁciency,” ISSCC, pp. 178–179, Feb.
+2025. http://doi.org/10.1109/ISSCC49661.2025.10904504
+
+
+
+
+                                                                                            Figure 19.9.2: Comparison of the DSD converter and the proposed ISDB converter,
+Figure 19.9.1: System diagrams of prior art and the proposed AC-DC converter.               voltage balance process, and the operating principle and phase of the ISDB converter.
+                   Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:43:15 UTC from IEEE Xplore. Restrictions apply.
+                                                                                                                                    DIGEST OF TECHNICAL PAPERS • 337
+ISSCC 2026 / SESSION 19 / HIGH-VOLTAGE, ISOLATED AND DISPLAY POWER / 19.9
+
+
+
+
+Figure 19.9.3: Schematic and DCM calibration process of the ISDB converter with Figure 19.9.4: Measured steady-state waveforms of the proposed AC-DC converter and
+measurement results of efﬁciency improvement in DCM.                            the ISDB converter.
+
+
+
+
+Figure 19.9.5: Measured load transient response, efﬁciency vs. POUT under different AC Figure 19.9.6: Performance benchmark and comparison with the state-of-the-art-
+input and DC output voltages.                                                          designs.
+
+
+
+
+Figure 19.9.7: Chip micrograph, PCB photo, and components list.
+                Authorized licensed use limited to: Hohai University Library. Downloaded on May 27,2026 at 13:43:15 UTC from IEEE Xplore. Restrictions apply.
+    • 2026 IEEE International Solid-State Circuits Conference                                                             979-8-3315-8936-3/26/$31.00 ©2026 IEEE
+

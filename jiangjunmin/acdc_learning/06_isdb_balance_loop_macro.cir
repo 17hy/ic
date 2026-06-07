@@ -1,0 +1,32 @@
+* 06 - ISDB VCH/VCL balance-loop macro
+* This is not the exact controller. It shows the paper's control idea:
+* if VCH > VCL, controlled charge transfer reduces VCH and raises VCL.
+
+.options method=gear reltol=1e-5 abstol=1e-10 vntol=1e-6
+.param csplit=47u
+.param kbal=0.002
+
+* Split bus capacitors around the DC-DC ground.
+* VCH starts at 36 V, VCL starts at 24 V.
+CH vrec_p 0 {csplit} IC=36
+CL 0 vrec_n {csplit} IC=24
+
+* Mismatch is VCH - VCL = V(vrec_p) + V(vrec_n), because vrec_n is negative.
+* Positive mismatch discharges CH and charges CL.
+BCH vrec_p 0 I={kbal*(V(vrec_p)+V(vrec_n))}
+BCL 0 vrec_n I={-kbal*(V(vrec_p)+V(vrec_n))}
+BMIS mismatch 0 V={V(vrec_p)+V(vrec_n)}
+BVCL vcl 0 V={-V(vrec_n)}
+
+.tran 20u 40m 0 20u uic
+.control
+run
+meas tran start_mismatch FIND v(mismatch) AT=100u
+meas tran final_vch FIND v(vrec_p) AT=40m
+meas tran final_vcl FIND v(vcl) AT=40m
+meas tran final_mismatch FIND v(mismatch) AT=40m
+print start_mismatch final_vch final_vcl final_mismatch
+wrdata 06_isdb_balance_loop_macro.csv time v(vrec_p) v(vcl) v(mismatch)
+quit
+.endc
+.end

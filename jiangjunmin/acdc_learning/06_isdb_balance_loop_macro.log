@@ -1,0 +1,22 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * 06 - isdb vch/vcl balance-loop macro
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 2011
+start_mismatch      =  1.18983e+01
+final_vch           =  3.01994e+01
+final_vcl           =  2.98006e+01
+final_mismatch      =  3.98777e-01
+start_mismatch = 1.189831e+01
+final_vch = 3.019939e+01
+final_vcl = 2.980061e+01
+final_mismatch = 3.987774e-01
+ngspice-46 done

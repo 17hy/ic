@@ -1,0 +1,22 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * 02 - direct ac-dc: bridge/bulk high-voltage bus plus non-isolated buck
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 45026
+avg_vbus            =  3.25000e+02 from=  6.00000e-03 to=  8.00000e-03
+avg_vout            =  1.21951e+01 from=  6.00000e-03 to=  8.00000e-03
+pp_vout             =  4.38709e-02 from=  6.00000e-03 to=  8.00000e-03
+max_vsw             =  3.25593e+02 at=  7.55162e-03
+avg_vbus = 3.250000e+02
+avg_vout = 1.219507e+01
+pp_vout = 4.387093e-02
+max_vsw = 3.255927e+02
+ngspice-46 done

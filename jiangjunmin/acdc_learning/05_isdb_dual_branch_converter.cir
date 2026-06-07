@@ -1,0 +1,59 @@
+* 05 - Proposed input-series dual-branch (ISDB) DC-DC stage
+* The AC-DC front end is abstracted as VREC. The two branches each see VREC/2.
+* Case A: VREC=60 V to VOUT=5 V. Case B: VREC=30 V to VOUT=12 V with D>0.5.
+
+.options method=gear reltol=1e-5 abstol=1e-10 vntol=1e-6
+.param fsw=2e6
+.param tper={1/fsw}
+.param rdcr=0.324
+
+* Case A: 60 V -> 5 V, IOUT=0.4 A, CCM.
+.param vrec_a=60
+.param vinhalf_a={vrec_a/2}
+.param iout_a=0.4
+.param vtarget_a=5
+.param duty_a={(vtarget_a-iout_a/2*rdcr)/vinhalf_a}
+.param load_a={vtarget_a/iout_a}
+
+VSW1_A sw1_a 0 PULSE(0 {vinhalf_a} 0 2n 2n {duty_a*tper} {tper})
+VSW2_A sw2_a 0 PULSE(0 {vinhalf_a} {tper/2} 2n 2n {duty_a*tper} {tper})
+L1_A sw1_a l1x_a 10u IC={iout_a/2}
+RDCR1_A l1x_a out_a {rdcr}
+L2_A sw2_a l2x_a 10u IC={iout_a/2}
+RDCR2_A l2x_a out_a {rdcr}
+COUT_A out_a 0 2.2u IC={vtarget_a}
+RLOAD_A out_a 0 {load_a}
+
+* Case B: 30 V -> 12 V, IOUT=0.18 A. Duty is about 0.8, so the phases overlap.
+.param vrec_b=30
+.param vinhalf_b={vrec_b/2}
+.param iout_b=0.18
+.param vtarget_b=12
+.param duty_b={(vtarget_b-iout_b/2*rdcr)/vinhalf_b}
+.param load_b={vtarget_b/iout_b}
+
+VSW1_B sw1_b 0 PULSE(0 {vinhalf_b} 0 2n 2n {duty_b*tper} {tper})
+VSW2_B sw2_b 0 PULSE(0 {vinhalf_b} {tper/2} 2n 2n {duty_b*tper} {tper})
+L1_B sw1_b l1x_b 10u IC={iout_b/2}
+RDCR1_B l1x_b out_b {rdcr}
+L2_B sw2_b l2x_b 10u IC={iout_b/2}
+RDCR2_B l2x_b out_b {rdcr}
+COUT_B out_b 0 2.2u IC={vtarget_b}
+RLOAD_B out_b 0 {load_b}
+
+.tran 20n 2m 1.5m 20n uic
+.control
+run
+meas tran avg_vout_a AVG v(out_a) from=1.5m to=2m
+meas tran pp_vout_a PP v(out_a) from=1.5m to=2m
+meas tran avg_il1_a AVG i(L1_A) from=1.5m to=2m
+meas tran avg_il2_a AVG i(L2_A) from=1.5m to=2m
+meas tran avg_vout_b AVG v(out_b) from=1.5m to=2m
+meas tran pp_vout_b PP v(out_b) from=1.5m to=2m
+meas tran avg_il1_b AVG i(L1_B) from=1.5m to=2m
+meas tran avg_il2_b AVG i(L2_B) from=1.5m to=2m
+print avg_vout_a pp_vout_a avg_il1_a avg_il2_a avg_vout_b pp_vout_b avg_il1_b avg_il2_b
+wrdata 05_isdb_dual_branch_converter.csv time v(sw1_a) v(sw2_a) v(out_a) i(L1_A) i(L2_A) v(sw1_b) v(sw2_b) v(out_b) i(L1_B) i(L2_B)
+quit
+.endc
+.end

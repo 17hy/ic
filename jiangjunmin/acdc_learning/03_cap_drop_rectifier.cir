@@ -1,0 +1,45 @@
+* 03 - Capacitor-drop AC-DC rectifier front end
+* 230 Vrms mains -> series X capacitor -> diode bridge -> low-voltage reservoir.
+* This is the front-end idea used before the paper's downstream DC-DC stage.
+
+.options method=gear reltol=1e-4 abstol=1e-9 vntol=1e-5
+.param vrms=230
+.param fline=50
+.param vpk={sqrt(2)*vrms}
+.param cx=0.68u
+.param crec=10u
+.param rload=1.7k
+.param vref=60
+.param prec_at_vref={4*fline*vref*cx*(vpk-vref)}
+
+VLINE mains neutral SIN(0 {vpk} {fline})
+RREFN neutral 0 1G
+
+* The X capacitor carries most of the mains voltage.
+CX mains xmid {cx}
+RESR_X xmid acx 5
+RBLEEDX mains acx 10Meg
+
+DREC1 acx recp DHV
+DREC2 neutral recp DHV
+DREC3 0 acx DHV
+DREC4 0 neutral DHV
+CREC recp 0 {crec}
+RLOAD recp 0 {rload}
+BVCX vcx 0 V={V(mains)-V(acx)}
+
+.model DHV D(Is=1n Rs=0.5 N=1.2 Cjo=5p Bv=800 Ibv=10u)
+
+.tran 20u 400m 300m 50u
+.control
+run
+meas tran avg_vrec AVG v(recp) from=300m to=400m
+meas tran min_vrec MIN v(recp) from=300m to=400m
+meas tran max_vrec MAX v(recp) from=300m to=400m
+meas tran pp_vrec PP v(recp) from=300m to=400m
+meas tran rms_vcx RMS v(vcx) from=300m to=400m
+print avg_vrec min_vrec max_vrec pp_vrec rms_vcx
+wrdata 03_cap_drop_rectifier.csv time v(mains,neutral) v(vcx) v(recp)
+quit
+.endc
+.end

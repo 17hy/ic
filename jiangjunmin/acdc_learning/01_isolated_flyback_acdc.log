@@ -1,0 +1,22 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * 01 - offline bridge/bulk plus isolated flyback average macro
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+Operating point simulation skipped by 'uic',
+  now using transient initial conditions.
+
+No. of Data Rows : 823
+avg_vbus            =  3.25000e+02 from=  6.00000e-03 to=  8.00000e-03
+avg_vout            =  1.19376e+01 from=  6.00000e-03 to=  8.00000e-03
+pp_vout             =  1.32765e-11 from=  6.00000e-03 to=  8.00000e-03
+max_vdrain          =  4.51376e+02 at=  8.00000e-03
+avg_vbus = 3.250000e+02
+avg_vout = 1.193765e+01
+pp_vout = 1.327649e-11
+max_vdrain = 4.513765e+02
+ngspice-46 done

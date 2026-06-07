@@ -1,0 +1,39 @@
+* 02 - Direct AC-DC: bridge/bulk high-voltage bus plus non-isolated buck
+* This represents the direct-rectified HV DC-DC approach discussed in the paper.
+* The key lesson is the extreme conversion ratio: 325 Vdc -> 12 V needs a very small duty.
+
+.options method=gear reltol=1e-4 abstol=1e-9 vntol=1e-5
+.param vbus_nom=325
+.param fsw=20k
+.param tper={1/fsw}
+.param duty=0.0295
+.param rload=66.7
+
+VBUS bus 0 DC {vbus_nom}
+CBULK bus 0 10u
+
+SBUCK bus sw gate 0 SWMOD
+VGATE gate 0 PULSE(0 10 0 50n 50n {duty*tper} {tper})
+DFW 0 sw DFAST
+LBUCK sw lx 1m IC=0.18
+RDCR lx out 0.5
+COUT out 0 220u IC=12
+RLOAD out 0 {rload}
+BSTRESS vsw_stress 0 V={V(bus)-V(sw)}
+
+.model DHV D(Is=1n Rs=0.5 N=1.2 Cjo=5p Bv=800 Ibv=10u)
+.model DFAST D(Is=1n Rs=0.05 N=1.1 Cjo=20p Tt=10n)
+.model SWMOD SW(Ron=0.5 Roff=1e9 Vt=4 Vh=0.5)
+
+.tran 0.1u 8m 6m 0.1u uic
+.control
+run
+meas tran avg_vbus AVG v(bus) from=6m to=8m
+meas tran avg_vout AVG v(out) from=6m to=8m
+meas tran pp_vout PP v(out) from=6m to=8m
+meas tran max_vsw MAX v(vsw_stress) from=6m to=8m
+print avg_vbus avg_vout pp_vout max_vsw
+wrdata 02_direct_rectifier_hv_buck.csv time v(bus) v(sw) v(out) i(LBUCK)
+quit
+.endc
+.end

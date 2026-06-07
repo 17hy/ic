@@ -1,0 +1,53 @@
+
+Note: No compatibility mode selected!
+
+
+Circuit: * 04 - capacitor-drop rectifier plus fixed-ratio switched-capacitor macro
+
+Doing analysis at TEMP = 27.000000 and TNOM = 27.000000
+
+Using SPARSE 1.3 as Direct Linear Solver
+
+Initial Transient Solution
+--------------------------
+
+Node                                   Voltage
+----                                   -------
+mains_s                            2.56271e-15
+neutral_s                          2.56271e-15
+xmid_s                             2.27428e-15
+acx_s                              2.27428e-15
+recp_s                            -2.66716e-18
+ideal_s                           -2.66716e-19
+out_s                             -2.51583e-19
+mains_l                            2.56317e-15
+neutral_l                          2.56317e-15
+xmid_l                             2.27456e-15
+acx_l                              2.27456e-15
+recp_l                            -2.66701e-18
+ideal_l                           -2.66701e-19
+out_l                             -2.51569e-19
+e_sc_l#branch                       1.8915e-20
+e_sc_s#branch                       1.8916e-20
+vline_l#branch                    -2.88612e-23
+vline_s#branch                    -2.88428e-23
+
+
+No. of Data Rows : 3011
+avg_vrec_s          =  4.95153e+01 from=  3.50000e-01 to=  5.00000e-01
+pp_vrec_s           =  2.43135e+01 from=  3.50000e-01 to=  5.00000e-01
+avg_vout_s          =  4.67060e+00 from=  3.50000e-01 to=  5.00000e-01
+pp_vout_s           =  2.26983e+00 from=  3.50000e-01 to=  5.00000e-01
+avg_vrec_l          =  4.96072e+01 from=  3.50000e-01 to=  5.00000e-01
+pp_vrec_l           =  2.77279e+00 from=  3.50000e-01 to=  5.00000e-01
+avg_vout_l          =  4.67926e+00 from=  3.50000e-01 to=  5.00000e-01
+pp_vout_l           =  2.59101e-01 from=  3.50000e-01 to=  5.00000e-01
+avg_vrec_s = 4.951528e+01
+pp_vrec_s = 2.431354e+01
+avg_vout_s = 4.670601e+00
+pp_vout_s = 2.269828e+00
+avg_vrec_l = 4.960720e+01
+pp_vrec_l = 2.772788e+00
+avg_vout_l = 4.679259e+00
+pp_vout_l = 2.591011e-01
+ngspice-46 done
